@@ -21,7 +21,3 @@ for 1 .. $children -> $child {
 #   children versus your real and virtual memory.  For example, a 1GB
 #   netbook froze with 19 children.
 # * Monitor your processes with a utility such as pstree or top.
-# * The library is very OS-dependent.  Win32 will definitely not work.
-#   The 'libz' may not be the best or only usable library.  YMMV.
-#   Tested on Debian Linux.  Patches welcome for OSX, Solaris, *BSD etc.
-
