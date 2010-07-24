@@ -10,7 +10,7 @@ LIBSYSTEM = $(shell $(PERL6_EXE) -e 'print @*INC[2]')
 LIBUSER   = $(shell $(PERL6_EXE) -e 'print @*INC[1]')
 
 # first the default target
-lib/NativeCall.pir: lib/NativeCall.pm6 $(LIBSYSTEM)/Test.pm
+lib/NativeCall.pir: lib/NativeCall.pm6
 	$(PERL6_EXE) --target=pir --output=lib/NativeCall.pir lib/NativeCall.pm6
 
 clean:
@@ -18,10 +18,6 @@ clean:
 	$(RM_F) lib/*.pir
 	@# delete all editor backup files
 	$(RM_F) *~ lib/*~
-
-test: lib/NativeCall.pir
-	prove --exec $(PERL6_EXE) t/mysqlclient.t
-	prove --exec $(PERL6_EXE) t/win32-api-call.t
 
 # standard install is to the shared system wide directory
 install: lib/NativeCall.pir
