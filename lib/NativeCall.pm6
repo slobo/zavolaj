@@ -79,11 +79,11 @@ our sub perl6-sig-to-backend-sig(Routine $r) {
     my $sig-string = $r.returns === Mu ?? 'v' !! map-type-to-sig-char($r.returns());
     my @params = $r.signature.params();
     for @params -> $p {
-	if $p.rw {
-	  $sig-string ~= 'V';
+        if $p.rw {
+            $sig-string ~= 'V';
         } else {
-	  $sig-string = $sig-string ~ map-type-to-sig-char($p.type);
-	}
+            $sig-string = $sig-string ~ map-type-to-sig-char($p.type);
+        }
     }
     return $sig-string;
 }
@@ -112,12 +112,12 @@ our multi trait_mod:<is>(Routine $r, $libname?, :$native!) {
         }
     }
     pir::setattribute__vPsP($r, '$!do', -> |$c {
-	my $backend-capture = |$c.map({ 
-		given $_ { 
-			when OpaquePointer { pir::descalarref__PP($_.ref) } 
-			default { $_ }
-		} 
-	});
+        my $backend-capture = |$c.map({ 
+            given $_ {
+                when OpaquePointer { pir::descalarref__PP($_.ref) }
+                default { $_ }
+            } 
+        });
         $return-mapper(
             pir::descalarref__PP( (pir::dlfunc__PPss(
                 ($lib ?? pir::descalarref__PP($lib) !! pir::null__P()),
