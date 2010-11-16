@@ -48,17 +48,17 @@ sub sqlite3_finalize( OpaquePointer $ppStmt )
     is native('libsqlite3')
     { ... }
 
-sub sqlite3_open( Str $filename, OpaquePointer $ppDB )
+sub sqlite3_open( Str $filename, OpaquePointer $ppDB is rw )
     returns Int
     is native('libsqlite3')
     { ... }
 
-sub sqlite3_open_v2( Str $filename, OpaquePointer $ppDB, Int $flags, Str $zVfs )
+sub sqlite3_open_v2( Str $filename, OpaquePointer $ppDB is rw, Int $flags, Str $zVfs )
     returns Int
     is native('libsqlite3')
     { ... }
 
-sub sqlite3_prepare_v2( OpaquePointer $ppDB, Str $sql_command, Int $nByte, OpaquePointer $ppStmt, OpaquePointer $pzTail )
+sub sqlite3_prepare_v2( OpaquePointer $ppDB, Str $sql_command, Int $nByte, OpaquePointer $ppStmt is rw, OpaquePointer $pzTail is rw)
     returns Int
     is native('libsqlite3')
     { ... }
@@ -75,9 +75,9 @@ sub sqlite3_table_column_metadata(OpaquePointer $ppDB, Str $zDbName, Str $zTable
 
 # ----------------------- main example program -------------------------
 
-my OpaquePointer $db;
-my OpaquePointer $stmt;
-my OpaquePointer $pzTail;
+my OpaquePointer $db = OpaquePointer.new;
+my OpaquePointer $stmt = OpaquePointer.new;
+my OpaquePointer $pzTail = OpaquePointer.new;
 my Positional of Str $pzDataType;
 my Positional of Str $pzCollSeq;
 my Positional of Int $pNotNull;
