@@ -82,7 +82,7 @@ our sub perl6-sig-to-backend-sig(Routine $r) {
         if $p.rw {
             $sig-string ~= 'V';
         } else {
-            $sig-string = $sig-string ~ map-type-to-sig-char($p.type);
+            $sig-string ~= map-type-to-sig-char($p.type);
         }
     }
     return $sig-string;
