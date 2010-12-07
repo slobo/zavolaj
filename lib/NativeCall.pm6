@@ -1,10 +1,4 @@
-class OpaquePointer {
-    has $!unmanaged = pir::new__Ps('UnManagedStruct');
-
-    method ref() {
-        $!unmanaged;
-    }
-}
+class OpaquePointer { }
 
 class NativeArray {
     has $!unmanaged;
@@ -112,19 +106,13 @@ our multi trait_mod:<is>(Routine $r, $libname?, :$native!) {
         }
     }
     pir::setattribute__vPsP($r, '$!do', -> |$c {
-        my $backend-capture = |$c.map({ 
-            given $_ {
-                when OpaquePointer { pir::descalarref__PP($_.ref) }
-                default { $_ }
-            } 
-        });
         $return-mapper(
             pir::descalarref__PP( (pir::dlfunc__PPss(
                 ($lib ?? pir::descalarref__PP($lib) !! pir::null__P()),
                 $entry-point,
                 $call-sig
                 ) // die("Could not locate symbol '$entry-point' in native library '{$libname || q<(resident)>}'")
-            ).(|$backend-capture) )
+            ).(|$c) )
         )
     });
 }
