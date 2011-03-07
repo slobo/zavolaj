@@ -19,6 +19,9 @@ clean:
 	@# delete all editor backup files
 	$(RM_F) *~ lib/*~
 
+test: lib/NativeCall.pir
+	env PERL6LIB=lib prove -e $(PERL6_EXE) -r t/
+
 # standard install is to the shared system wide directory
 install: lib/NativeCall.pir
 	@echo "--> $(LIBSYSTEM)"
