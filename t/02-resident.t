@@ -49,11 +49,9 @@ diag 'Str parameters';
 sub strlen(Str $s) returns Int is native() { ... }
 is strlen("abcde"), 5, 'f(Str) -> Int - strlen("abcde") is 5'; # test 11
 sub strcmp(Str $a, Str $b) returns Int is native() { ... }
-is strcmp("a","z"), -1, 'f(Str,Str) -> Int - strcmp("a","z") is -1'; # test 12
-# of course the preceding -1 is a bomblet, any value < 0 is valid
+ok strcmp("a","z") < 0, 'f(Str,Str) -> Int - strcmp("a","z") is -1'; # test 12
 is strcmp("p","p"), 0, 'f(Str,Str) -> Int - strcmp("p","p") is 0'; # test 13
-is strcmp("9","10"), 1, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 14
-# ditto bomblet
+ok strcmp("9","10") > 0, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 14
 
 #fail: got: '0' expected: '2.5' # maybe because float==single, Num==double
 #sub sqrtf(Num $float) returns Num is native() { ... }
