@@ -10,19 +10,24 @@ complement Blizkost, a Rakudo-to-Perl-5 integration project.
 
 The functions that Zavolaj can currently call must have signatures (the
 type of the return value and the types of the arguments) that already
-exist in a fixed list inside Parrot.  Adding more signatures currently
-involves adding entries to the parrot/src/nci/extra_thunks.nci file.
+exist in a fixed list inside Parrot, where they are called 'thunks'.
+There are two source files used to create the list, core_thunks.nci and
+extra_thunks.nci.  Adding more signatures currently involves adding
+entries to the parrot/src/nci/extra_thunks.nci file, see
+https://github.com/parrot/parrot/blob/master/src/nci/extra_thunks.nci.
+After a refactor in March 2011, core_thunks.nci contains only comments.
 
 There is a project to enable calling all possible function signatures:
 http://github.com/plobsing/parrot-libjit-fb is currently a Parrot
-extension.  Zavolaj does not use it yet.
+extension.  Zavolaj does not use it yet.  This page shows the status:
+https://github.com/parrot/parrot/blob/master/src/nci/framebuilder.pod
 
 MySQL
 
 Initially the MySQL client library is being used as a test case, because
 it is a popular application, is frequently asked about, and because
 Parrot does have all the function signatures.  There is a Rakudo project
-http://github.com/mberends/fakedbi that wraps these functions with a DBI
+http://github.com/mberends/minidbi that wraps these functions with a DBI
 compatible interface.
 
 The /usr/include/mysql.h file defines the mysql client library functions
@@ -67,5 +72,4 @@ Before running 'make test', you *must* perform this:
     sudo apt-get install libmysqlclient-dev
     sudo apt-get install libtest-harness-perl
     export PERL6LIB=lib
-
 

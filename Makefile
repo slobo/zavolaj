@@ -1,26 +1,44 @@
 # Makefile for zavolaj's NativeCall.pm
 
+# targets that do not produce files
+.PHONY: clean test libtest help install install-user uninstall \
+	uninstall-user
+
 PERL_EXE  = perl
 PERL6_EXE = perl6
 CP        = $(PERL_EXE) -MExtUtils::Command -e cp
 RM_F      = $(PERL_EXE) -MExtUtils::Command -e rm_f
+RM_RF     = $(PERL_EXE) -MExtUtils::Command -e rm_rf
 TEST_F    = $(PERL_EXE) -MExtUtils::Command -e test_f
 # try to make these OS agnostic (ie use the same definition on Unix and Windows)
-LIBSYSTEM = $(shell $(PERL6_EXE) -e 'print @*INC[2]')
-LIBUSER   = $(shell $(PERL6_EXE) -e 'print @*INC[1]')
+LIBSYSTEM = $(shell $(PERL6_EXE) -e 'print @*INC[1]')
+LIBUSER   = $(shell $(PERL6_EXE) -e 'print @*INC[0]')
 
 # first the default target
 lib/NativeCall.pir: lib/NativeCall.pm6
 	$(PERL6_EXE) --target=pir --output=lib/NativeCall.pir lib/NativeCall.pm6
 
+lib/libzavolajtest.so: lib/libzavolajtest.c lib/libzavolajtest.h
+	cc -o lib/libzavolajtest.o -fPIC -c lib/libzavolajtest.c
+	cc -shared -o lib/libzavolajtest.so lib/libzavolajtest.o
+
+#LD_LIBRARY_PATH=./t/lib ld -o t/lib/libzavolajtest.so.1.0 -shared -soname libzavolajtest.so.1 libzavolajtest.o
+
+# TODO: make this work somehow with Microsoft C
+lib/libzavolajtest.dll: lib/libzavolajtest.c lib/libzavolajtest.h
+	cc -o lib/libzavolajtest.o -fPIC -c lib/libzavolajtest.c
+	cc -shared -o lib/libzavolajtest.so lib/libzavolajtest.o
+
 clean:
 	@# delete compiled files
-	$(RM_F) lib/*.pir
+	$(RM_F) lib/*.pir lib/*.o lib/*.so
 	@# delete all editor backup files
-	$(RM_F) *~ lib/*~
+	$(RM_F) *~ lib/*~ t/*~ t/lib/*~
 
 test: lib/NativeCall.pir
-	env PERL6LIB=lib prove -e $(PERL6_EXE) -r t/
+	env PERL6LIB=lib LD_LIBRARY_PATH=lib prove -e $(PERL6_EXE) -r t/
+
+libtest: lib/libzavolajtest.so
 
 # standard install is to the shared system wide directory
 install: lib/NativeCall.pir
@@ -52,6 +70,7 @@ help:
 	@echo
 	@echo "You can make the following in 'zavolaj':"
 	@echo "test           runs a local test suite"
+	@echo "libtest        creates and tests a custom library"
 	@echo "clean          removes compiled, temporary and backup files"
 	@echo "install        copies .pm6 and .pir file(s) to system lib/"
 	@echo "               (may need admin or root permission)"
