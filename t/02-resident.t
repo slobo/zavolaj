@@ -17,7 +17,7 @@
 
 use Test;
 use NativeCall;
-plan 16;
+plan 22;
 
 diag 'No parameters';
 sub getpid() returns Int is native() { ... }
@@ -43,15 +43,22 @@ is fabs(3.3), 3.3, "f(Num) -> Num - fabs(3.3) is 3.3";         # test 9
 is fabs(-5.5), 5.5, "f(Num) -> Num - fabs(-5.5) is 5.5";       # test 10
 sub ilogb(Num $n) returns Int is native() { ... }
 is ilogb(63.9), 5, "f(Num) -> Int - ilogb(63.9) is 5";         # test 11
-is ilogb(-8.1), 3, "f(Num) -> Int - ilogb(-8.1) is 3";         # test 11
+is ilogb(-8.1), 3, "f(Num) -> Int - ilogb(-8.1) is 3";         # test 12
 
 diag 'Str parameters';
 sub strlen(Str $s) returns Int is native() { ... }
-is strlen("abcde"), 5, 'f(Str) -> Int - strlen("abcde") is 5'; # test 11
+is strlen("abcde"), 5, 'f(Str) -> Int - strlen("abcde") is 5'; # test 13
 sub strcmp(Str $a, Str $b) returns Int is native() { ... }
-ok strcmp("a","z") < 0, 'f(Str,Str) -> Int - strcmp("a","z") is -1'; # test 12
-is strcmp("p","p"), 0, 'f(Str,Str) -> Int - strcmp("p","p") is 0'; # test 13
-ok strcmp("9","10") > 0, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 14
+ok strcmp("a","z") < 0, 'f(Str,Str) -> Int - strcmp("a","z") is -1'; # test 14
+is strcmp("p","p"), 0, 'f(Str,Str) -> Int - strcmp("p","p") is 0'; # test 15
+ok strcmp("9","10") > 0, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 16
+sub strncmp(Str $a, Str $b, Int $i) returns Int is native() { ... }
+is strncmp("xa","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xa","xb",1) is 0'; # test 17
+is strncmp("xb","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xb","xb",1) is 0'; # test 18
+is strncmp("xc","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",1) is 0'; # test 19
+ok strncmp("xa","xb",2) < 0, 'f(Str,Str,Int) -> Int - strncmp("xa","xb",2)  < 0'; # test 20
+is strncmp("xb","xb",2),  0, 'f(Str,Str,Int) -> Int - strncmp("xb","xb",2) is 0'; # test 21
+ok strncmp("xc","xb",2) > 0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",2)  > 0'; # test 22
 
 #fail: got: '0' expected: '2.5' # maybe because float==single, Num==double
 #sub sqrtf(Num $float) returns Num is native() { ... }
@@ -61,6 +68,10 @@ ok strcmp("9","10") > 0, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 14
 #sub ceilf(Num $n) returns Num is native() { ... }
 #is ceilf(41.01), 42, "f(Num) -> Num - ceilf(41.01) is 42"; #fail: got: '-0' expected: '42'
 #is ceilf(-3.99), -3, "f(Num) -> Num - ceilf(-3.99) is -3"; #fail: got:  '1' expected: '-3'
+
+#fail: got: '-76' expected: '2' # probably double->float error in Parrot
+#sub ilogbf(Num $n) returns Int is native() { ... }
+#is ilogbf(7.9), 2, "f(Num) -> Int - ilogbf(7.9) is 2";
 
 #ceill(long double) returns long double
 #sub ceill(Num $n) returns Num is native() { ... }
@@ -77,9 +88,13 @@ ok strcmp("9","10") > 0, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 14
 
 #fail: got: '0' expected: '3'
 #sub strchr(Str $s, Int $c) returns Int is native() { ... }
-#is strchr("abcde",0x44), 3, 'f(Str,Int) -> Int - strchr("abcde",0x44) is 3'; # test 10
+#is strchr("abcde",0x44), 3, 'f(Str,Int) -> Int - strchr("abcde",0x44) is 3';
 
 #fail: got: '160719491' expected: '3'
 #sub strstr(Str $a, Str $b) returns Int is native() { ... }
 #is strstr("abcde","d"), 3, 'f(Str,Str) -> Int - strchr("abcde","d") is 3';
+
+#fail: got: '' expected: 'de'
+#sub strchr(Str $a, Int $c) returns Str is native() { ... }
+#is strchr("abcde",0x44), "de", 'f(Str,Int) -> Str - strchr("abcde",0x44) is "de"';
 
