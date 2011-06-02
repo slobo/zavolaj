@@ -1,7 +1,7 @@
 # Makefile for zavolaj's NativeCall.pm
 
 # targets that do not produce files
-.PHONY: clean test libtest help install install-user uninstall \
+.PHONY: clean test help install install-user uninstall \
 	uninstall-user
 
 PERL_EXE  = perl
@@ -22,9 +22,7 @@ lib/libzavolajtest.so: lib/libzavolajtest.c lib/libzavolajtest.h
 	cc -o lib/libzavolajtest.o -fPIC -c lib/libzavolajtest.c
 	cc -shared -o lib/libzavolajtest.so lib/libzavolajtest.o
 
-#LD_LIBRARY_PATH=./t/lib ld -o t/lib/libzavolajtest.so.1.0 -shared -soname libzavolajtest.so.1 libzavolajtest.o
-
-# TODO: make this work somehow with Microsoft C
+# TODO: debug this on a Windows installation
 lib/libzavolajtest.dll: lib/libzavolajtest.c lib/libzavolajtest.h
 	cc -o lib/libzavolajtest.o -fPIC -c lib/libzavolajtest.c
 	cc -shared -o lib/libzavolajtest.so lib/libzavolajtest.o
@@ -68,7 +66,6 @@ help:
 	@echo
 	@echo "You can make the following in 'zavolaj':"
 	@echo "test           runs a local test suite"
-	@echo "libtest        creates and tests a custom library"
 	@echo "clean          removes compiled, temporary and backup files"
 	@echo "install        copies .pm6 and .pir file(s) to system lib/"
 	@echo "               (may need admin or root permission)"

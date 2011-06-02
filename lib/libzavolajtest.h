@@ -13,7 +13,7 @@
 
 
 
-/* Sorted alphabetically by return type, and then parameter types */
+/* Functions sorted alphabetically by return type and parameter types */
 
 /* double return */
 double test_d();
@@ -24,14 +24,16 @@ double test_dd(double);
 /* int return */
 int test_i();
 int test_ii(int);
-int test_ip(char * s);
+int test_iii(int, int);
+int test_ip(char *);
+int test_ipp(char *, char *);
 /* array of int return */
 int * test_I();
 
 /* pointer (string) return */
-char * test_p();
-char * test_pi(int);
-char * test_pp(char *);
+char * test_s();
+char * test_si(int);
+char * test_ss(char *);
 
 /* void return */
 void test_v();
