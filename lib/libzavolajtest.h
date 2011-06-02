@@ -25,6 +25,8 @@ double test_dd(double);
 int test_i();
 int test_ii(int);
 int test_ip(char * s);
+/* array of int return */
+int * test_I();
 
 /* pointer (string) return */
 char * test_p();

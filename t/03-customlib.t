@@ -6,7 +6,7 @@
 
 use Test;
 use NativeCall;
-plan 6;
+plan 7;
 
 # double (Num) return
 diag 'functions that return a double precision floating point number';
@@ -22,10 +22,13 @@ sub test_ii(Int $i) returns Int is native('libzavolajtest'){ ... }
 is test_ii(21), 63, 'test_ii(21)';                                   # 4
 sub test_ip(Str $s) returns Int is native('libzavolajtest'){ ... }
 is test_ip("abcde"), 5, 'test_ip("abcde")';                          # 5
+# array of int (Positional of Int) return
+sub test_I() returns Positional of Int is native('libzavolajtest'){ ... }
+ok test_I().WHAT ~~ NativeArray, 'test_I()';                         # 6
 
 # pointer (Str) return
 sub test_p() returns Str is native('libzavolajtest'){ ... }
-is test_p(), "foobar", 'test_p()';                                   # 6
+is test_p(), "foobar", 'test_p()';                                   # 7
 
 
 #abort: Invalid character in ASCII string
