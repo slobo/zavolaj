@@ -22,9 +22,9 @@ class NativeArray {
         my $fpa = pir::new__Ps('ResizableIntegerArray');
         my $typeid;
         given $!of {
-            when Str { $typeid = -70 }
-            when Int { $typeid = -92 }
-            when Num { $typeid = -83 }
+            when Str { $typeid = 30 }
+            when Int { $typeid = 7 }
+            when Num { $typeid = 16 }
             default { die "Unknown type"; }
         }
         Q:PIR {
@@ -89,6 +89,11 @@ our sub make-mapper(Mu $type) {
     }
 }
 
+our $ncifunc = Q:PIR {
+    load_bytecode 'NCI/Utils.pbc'
+    %r = get_root_global ['parrot';'NCI';'Utils'], 'ncifunc'
+};
+
 our multi trait_mod:<is>(Routine $r, $libname?, :$native!) {
     my $entry-point   = $r.name();
     my $call-sig      = perl6-sig-to-backend-sig($r);
@@ -103,7 +108,7 @@ our multi trait_mod:<is>(Routine $r, $libname?, :$native!) {
     }
     pir::setattribute__vPsP($r, '$!do', -> |$c {
         $return-mapper(
-            pir::descalarref__PP( (pir::dlfunc__PPss(
+            pir::descalarref__PP( ($ncifunc(
                 ($lib ?? pir::descalarref__PP($lib) !! pir::null__P()),
                 $entry-point,
                 $call-sig
