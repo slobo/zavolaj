@@ -20,7 +20,7 @@ lib/NativeCall.pir: lib/NativeCall.pm6
 
 lib/libzavolajtest.so: lib/libzavolajtest.c lib/libzavolajtest.h
 	cc -o lib/libzavolajtest.o -fPIC -c lib/libzavolajtest.c
-	cc -shared -o lib/libzavolajtest.so lib/libzavolajtest.o
+	cc -shared -s -o lib/libzavolajtest.so lib/libzavolajtest.o
 
 # TODO: debug this on a Windows installation
 lib/libzavolajtest.dll: lib/libzavolajtest.c lib/libzavolajtest.h
