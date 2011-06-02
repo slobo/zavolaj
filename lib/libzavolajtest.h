@@ -17,12 +17,19 @@
 
 /* double return */
 double test_d();
+double test_dd(double);
 
 /* float return */
 
 /* int return */
 int test_i();
 int test_ii(int);
+int test_ip(char * s);
+
+/* pointer (string) return */
+char * test_p();
+char * test_pi(int);
+char * test_pp(char *);
 
 /* void return */
 void test_v();

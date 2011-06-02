@@ -35,10 +35,8 @@ clean:
 	@# delete all editor backup files
 	$(RM_F) *~ lib/*~ t/*~ t/lib/*~
 
-test: lib/NativeCall.pir
+test: lib/NativeCall.pir lib/libzavolajtest.so
 	env PERL6LIB=lib LD_LIBRARY_PATH=lib prove -e $(PERL6_EXE) -r t/
-
-libtest: lib/libzavolajtest.so
 
 # standard install is to the shared system wide directory
 install: lib/NativeCall.pir
