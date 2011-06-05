@@ -10,6 +10,7 @@ unsigned short * biggishintDecrement             (unsigned short * biggishint);
 unsigned short * biggishintDivide                (unsigned short * biggishint1, unsigned short * biggishint2);
 unsigned short * biggishintFromDecimalString     (char * str);
 unsigned short * biggishintFromHexadecimalString (char * str);
+unsigned short * biggishintFromLong              (long l);
 unsigned short * biggishintIncrement             (unsigned short * biggishint);
 unsigned short * biggishintLogicalAnd            (unsigned short * biggishint1, unsigned short * biggishint2);
 unsigned short * biggishintLogicalNot            (unsigned short * biggishint);
