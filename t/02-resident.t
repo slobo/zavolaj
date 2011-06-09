@@ -5,6 +5,9 @@
 # available this way are the C standard library functions such as
 # isalpha() and similar.  See http://www.gnu.org/software/libc/manual/.
 
+# Zavolaj refers to resident functions by not passing a library name to
+# the 'is native()' trait.
+
 # Note: do not try this with function names that match same named
 # functions in Perl 6 such as sqrt(), because you will not be able to
 # tell which function you have actually called.
@@ -17,7 +20,7 @@
 
 use Test;
 use NativeCall;
-plan 24;
+plan 26;
 
 diag 'No parameters';
 sub getpid() returns Int is native() { ... }
@@ -49,16 +52,22 @@ diag 'Str parameters';
 sub strlen(Str $s) returns Int is native() { ... }
 is strlen("abcde"), 5, 'f(Str) -> Int - strlen("abcde") is 5'; # test 13
 sub strcmp(Str $a, Str $b) returns Int is native() { ... }
-ok strcmp("a","z") < 0, 'f(Str,Str) -> Int - strcmp("a","z") is -1'; # test 14
-is strcmp("p","p"), 0, 'f(Str,Str) -> Int - strcmp("p","p") is 0'; # test 15
+ok strcmp("a","z") < 0, 'f(Str,Str) -> Int - strcmp("a","z") is -1';  # test 14
+is strcmp("p","p"), 0, 'f(Str,Str) -> Int - strcmp("p","p") is 0';    # test 15
 ok strcmp("9","10") > 0, 'f(Str,Str) -> Int - strcmp("9","10") is 1'; # test 16
+sub strstr(Str $a, Str $b) returns Str is native() { ... }
+is strstr("abcde","d"), "de", 'f(Str,Str) -> Str - strstr("abcde","d") is "de"'; # test 17
+is strstr("abcde","x"),   "", 'f(Str,Str) -> Str - strstr("abcde","x") is   ""'; # test 18
+sub strchr(Str $s, Int $c) returns Str is native() { ... }
+is strchr("abcde",0x64), "de", 'f(Str,Int) -> Str - strchr("abcde",0x64) is "de"'; # test 19
+is strchr("abcde",0x74),   "", 'f(Str,Int) -> Str - strchr("abcde",0x74) is   ""'; # test 20
 sub strncmp(Str $a, Str $b, Int $i) returns Int is native() { ... }
-is strncmp("xa","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xa","xb",1) is 0'; # test 17
-is strncmp("xb","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xb","xb",1) is 0'; # test 18
-is strncmp("xc","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",1) is 0'; # test 19
-ok strncmp("xa","xb",2) < 0, 'f(Str,Str,Int) -> Int - strncmp("xa","xb",2)  < 0'; # test 20
-is strncmp("xb","xb",2),  0, 'f(Str,Str,Int) -> Int - strncmp("xb","xb",2) is 0'; # test 21
-ok strncmp("xc","xb",2) > 0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",2)  > 0'; # test 22
+is strncmp("xa","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xa","xb",1) is 0'; # test 21
+is strncmp("xb","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xb","xb",1) is 0'; # test 22
+is strncmp("xc","xb",1),  0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",1) is 0'; # test 23
+ok strncmp("xa","xb",2) < 0, 'f(Str,Str,Int) -> Int - strncmp("xa","xb",2)  < 0'; # test 24
+is strncmp("xb","xb",2),  0, 'f(Str,Str,Int) -> Int - strncmp("xb","xb",2) is 0'; # test 25
+ok strncmp("xc","xb",2) > 0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",2)  > 0'; # test 26
 
 #fail: got: '0' expected: '2.5' # maybe because float==single, Num==double
 #sub sqrtf(Num $float) returns Num is native() { ... }
@@ -85,14 +94,6 @@ ok strncmp("xc","xb",2) > 0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",2)  > 0'
 #abort: Segmentation fault
 #sub time() returns OpaquePointer is native() { ... }
 #ok time()!=0, "f() -> OpaquePointer - time()!=0";
-
-#fail: got: '0' expected: '3'
-sub strchr(Str $s, Int $c) returns Str is native() { ... }
-is strchr("abcde",0x64), "de", 'f(Str,Int) -> Str - strchr("abcde",0x64) is "de"';
-
-#fail: got: '160719491' expected: '3'
-sub strstr(Str $a, Str $b) returns Str is native() { ... }
-is strstr("abcde","d"), "de", 'f(Str,Str) -> Str - strchr("abcde","d") is "de"';
 
 #fail: got: '' expected: 'de'
 #sub strchr(Str $a, Int $c) returns Str is native() { ... }
