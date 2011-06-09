@@ -27,8 +27,10 @@ int test_ii(int);
 int test_iii(int, int);
 int test_ip(char *);
 int test_ipp(char *, char *);
+
 /* array of int return */
 int * test_I();
+int * test_Ii(int);
 
 /* pointer (string) return */
 char * test_s();
@@ -38,5 +40,7 @@ char * test_ss(char *);
 /* void return */
 void test_v();
 void test_vi(int);
+void test_vI(int *);
+void test_vIi(int *, int);
 
 /* end of libzavolajtest.h */
