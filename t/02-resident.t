@@ -17,7 +17,7 @@
 
 use Test;
 use NativeCall;
-plan 22;
+plan 24;
 
 diag 'No parameters';
 sub getpid() returns Int is native() { ... }
@@ -87,12 +87,12 @@ ok strncmp("xc","xb",2) > 0, 'f(Str,Str,Int) -> Int - strncmp("xc","xb",2)  > 0'
 #ok time()!=0, "f() -> OpaquePointer - time()!=0";
 
 #fail: got: '0' expected: '3'
-#sub strchr(Str $s, Int $c) returns Int is native() { ... }
-#is strchr("abcde",0x44), 3, 'f(Str,Int) -> Int - strchr("abcde",0x44) is 3';
+sub strchr(Str $s, Int $c) returns Str is native() { ... }
+is strchr("abcde",0x64), "de", 'f(Str,Int) -> Str - strchr("abcde",0x64) is "de"';
 
 #fail: got: '160719491' expected: '3'
-#sub strstr(Str $a, Str $b) returns Int is native() { ... }
-#is strstr("abcde","d"), 3, 'f(Str,Str) -> Int - strchr("abcde","d") is 3';
+sub strstr(Str $a, Str $b) returns Str is native() { ... }
+is strstr("abcde","d"), "de", 'f(Str,Str) -> Str - strchr("abcde","d") is "de"';
 
 #fail: got: '' expected: 'de'
 #sub strchr(Str $a, Int $c) returns Str is native() { ... }
