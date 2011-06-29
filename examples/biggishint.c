@@ -50,7 +50,8 @@
 /* Use biggishint at your risk and without warranty.  Give due credit */
 /* if you do.  Written by Martin Berends. */
 
-/* See also: http://gmplib.org/manual/ */
+/* See also: a much bigger library: http://gmplib.org/manual/ */
+/* Donald E. Knuth The Art of Computer Programming Vol 2 */
 
 /* TODO: overflow detection */
 /* TODO: change from big endian to little endian */
@@ -58,6 +59,7 @@
 #include <assert.h>  /* assert */
 #include <ctype.h>   /* tolower */
 #include <limits.h>  /* USHRT_MAX */
+#include <stdio.h>   /* printf, only when debugging */
 #include <stdlib.h>  /* calloc malloc realloc free */
 #include <string.h>  /* strlen strncmp */
 #include "biggishint.h"  /* (all externally callable functions) */
@@ -66,6 +68,7 @@
 #error In this C compiler a short int is not a 16 bit number.
 #endif
 
+/* #define BIGGISHINT_TRACE */
 
 /* Internal functions are declared here, their definitions are lower */
 /* down. */
@@ -76,7 +79,7 @@ int              biggishint_internal_comparemagnitude(unsigned short * bi1, unsi
 unsigned short * biggishint_internal_shiftleft(unsigned short * bi1, unsigned int bitcount);
 unsigned short * biggishint_internal_shiftright(unsigned short * bi1, unsigned int bitcount);
 void             biggishint_internal_shortdivide(unsigned short * bi1, unsigned short * i2);
-unsigned short * biggishint_internal_shortmultiply(unsigned short * bi1, unsigned short i2);
+void             biggishint_internal_shortmultiply(unsigned short ** bi1, unsigned short i2);
 unsigned short * biggishint_internal_trim(unsigned short ** bi1);
 
 
@@ -106,8 +109,9 @@ biggishintCompare(unsigned short * bi1, unsigned short * bi2)
 
 
 /* biggishintDivide */
+/* see The Art of Computer Programming Vol 2 3rd Ed p270-275 */
 unsigned short *
-biggishintDivide(unsigned short * bi1, unsigned short * bi2)
+biggishintDivide(unsigned short * bi1, unsigned short * divisor)
 {
     /* Before starting on the main long division, which is slow, try */
     /* to identify divisors that offer an opportunity for a shortcut, */
@@ -116,120 +120,242 @@ biggishintDivide(unsigned short * bi1, unsigned short * bi2)
     /* In contast with most of the other routines, this one uses */
     /* multiple returns to avoid having many levels of nested */
     /* conditionals. */
-    unsigned short   bi1size, bi2size, bi2datacount, remainderdatacount;
-//  unsigned short divisordatacount;
-    unsigned short * quotient, * pquotient, * pquotientend;
-//  unsigned short * pbi1;
-    unsigned short * pbi2;
-    unsigned short remaindersize;
-    unsigned short partialquotient;
-    unsigned short * remainder, * divisorshifted, * divisormultiplied;
-    unsigned short * premainder, * remainder_temp, * pdivisorshifted;
-    unsigned short divisorshiftcount;
-    int sign1, sign2, sign, wordoffset, comparison;
-    unsigned long trialdividend, trialdivisor, trialquotient, trialremainder;
-    bi1size = (* bi1 & 0xfffc) >> 1;
-    bi2size = (* bi2 & 0xfffc) >> 1;
+    unsigned short   bi1size, divisorsize, dividendword1, dividendword2;
+    unsigned short * dividend, * pdividend, * pdividendhi, * pdividendlo;
+    unsigned short * quotient, * pquotient, * pquotienthi, * pquotientlo;
+    unsigned short * pdivisor, * pdivisorhi, * pdivisorlo;
+    int sign1, sign2, sign, comparison, divisorshift;
+    unsigned long dividendcarry, trialdivisor;
+    unsigned long tempquotient, trialquotientmin, quotientcarry;
+    bi1size     = (* bi1 & 0xfffc) >> 1;
+    divisorsize = (* divisor & 0xfffc) >> 1;
     sign1 = * bi1 & 1;
-    sign2 = * bi2 & 1;
+    sign2 = * divisor & 1;
     sign  = sign1 ^ sign2;
     /* Does dividend have fewer words than divisor? */
-    if (bi1size < bi2size) {  /* quotient becomes 0 */
+    if (bi1size < divisorsize) {  /* quotient becomes 0 */
         quotient = (unsigned short *) calloc(2, sizeof(short));
         * quotient = 4;
-        return biggishint_internal_trim(&quotient);
+        return quotient;
     }
     /* Is divisor only a 16 bit unsigned number? */
-    if (bi2size == 2) { /* use short division instead of long */
-        unsigned short divisor = bi2[1];
+    if (divisorsize == 2) { /* use short division instead of long */
+        unsigned short shortdivisor = divisor[1];
         quotient = biggishint_internal_clone(bi1);
-        biggishint_internal_shortdivide(quotient, & divisor);
+        biggishint_internal_shortdivide(quotient, & shortdivisor);
         * quotient ^= sign2;
         return biggishint_internal_trim(&quotient);
     }
-    comparison = biggishint_internal_comparemagnitude(bi1, bi2);
     /* Is dividend less in magnitude than divisor? */
+    comparison = biggishint_internal_comparemagnitude(bi1, divisor);
     if (comparison<0) {  /* quotient becomes 0 */
         /* Hope the C compiler merges this code with the same code in */
         /* (bi1size < bi2size) above.  Repeated here because the */
         /* earlier case avoids the comparemagnitude function. */
         quotient = (unsigned short *) calloc(2, sizeof(short));
         * quotient = 4;
-        return biggishint_internal_trim(&quotient);
+        return quotient;
     }
     /* Is dividend equal in magnitude to divisor? */
     if (comparison==0) {  /* quotient becomes 1 (+ or -) */
         quotient = (unsigned short *) calloc(2, sizeof(short));
         * quotient = 4 | sign;
         quotient[1] = 1;
-        return biggishint_internal_trim(&quotient);
+        return quotient;
     }
     /* Is divisor a power of two or a multiple of a power of two? */
-    /* ie is there only a single 1 bit or at least one trailing 0 bit */
+    /* ie is there only a single 1 bit or at least one trailing 0 bit? */
     if (0) {
         ;    /* TODO: right shift optimization */
     }
-    /* Do long division as a last resort because none of the short */
-    /* cuts could be used instead. */
-    /* The remainder initially contains the dividend (bi1) and will */
-    /* be gradually reduced until it is less than the divisor. */
-    remainder = biggishint_internal_clone(bi1);
-    remaindersize = bi1size;
-    premainder = remainder + 1;
-    remainderdatacount = remaindersize - 1;
-    if (remainderdatacount>1 && *premainder==0) { /* is leading zero? */
-        ++premainder;          /* first data word in remainder */
-        --remainderdatacount;
-        assert( *premainder != 0 );  /* ensure it is properly trimmed */
-    }
-    /* Make a copy of the divisor shifted left so that its first data */
-    /* word aligns with the first data word of the remainder. */
-    pbi2 = bi2 + 1;              /* point to first data word of bi2 */
-    bi2datacount = bi2size - 1;  /* number of data words */
-    if (bi2datacount>1 && *pbi2==0) {  /* first word is zero */
-        ++pbi2;  /* point to next data word */
-        --bi2datacount;
-        assert( *pbi2 != 0 );  /* ensure it is properly trimmed */
-    }
-    divisorshifted = (unsigned short *) calloc(bi1size, sizeof(short));
-    * divisorshifted = bi1size << 1;
-    pdivisorshifted = divisorshifted + (premainder-remainder) + (*pbi2 > *premainder ? 1 : 0);
-    divisorshiftcount = remainderdatacount - bi2datacount;
-    memmove(pdivisorshifted, pbi2, bi2datacount);
-    /* Prepare the quotient (result) */
+    /* Perform long division because none of the quicker algorithms */
+    /* above could be used with the given parameters. */
+    assert( bi1size >= 4 ); assert( divisorsize >= 4 );
+    /* Initialize dividend with bi1.  The loop below will repeatedly */
+    /* subtract multiples of divisorshifted until the remainder is */
+    /* less than divisor. */
+    dividend = biggishint_internal_clone(bi1);
+    pdividendhi = dividend + (dividend[1] ? 1 : 2);
+    pdividendlo = dividend + bi1size - 1;
+    #ifdef BIGGISHINT_TRACE
+        fprintf(stdout,"dividend %s%04x", (* dividend & 1)?"-":"",
+            * (pdividend=pdividendhi));
+        while (++pdividend <= pdividendlo)
+            fprintf(stdout,"_%04x", * pdividend);
+        fprintf(stdout," at %p hi %+ld lo %+ld\n",
+            dividend, pdividendhi-dividend, pdividendlo-dividend);
+    #endif
+    /* Point to the divisor's highest and lowest data words */
+    pdivisorhi = divisor + (divisor[1] ? 1 : 2);
+    pdivisorlo = divisor + divisorsize - 1;
+    trialdivisor = (unsigned long) (* pdivisorhi) + 1;
+    #ifdef BIGGISHINT_TRACE
+        fprintf(stdout,"divisor  %s%04x", (* divisor & 1)?"-":"",
+            * (pdivisor=pdivisorhi));
+        while (++pdivisor <= pdivisorlo)
+            fprintf(stdout,"_%04x", * pdivisor);
+        fprintf(stdout," at %p hi %+ld lo %+ld\n",
+            divisor, pdivisorhi-divisor, pdivisorlo-divisor);
+    #endif
+    /* Initialize the quotient (result)  */
     quotient = (unsigned short *) calloc(bi1size, sizeof(short));
-//  pquotientend = quotient + bi1size;
     * quotient = bi1size << 1 | sign;
-    pquotient = quotient + bi1size - bi2size; /* bi1size >= bi2size from above */
-    trialdividend = 0;
-    /* Produce one digit of the quotient (result) at a time */
-    for (wordoffset=1; wordoffset<bi1size; ++wordoffset) {
-        /* In order to not have to read all the digits of the shifted */
-        /* divisor, conservatively perform a trial division of the */
-        /* first word of the remainder by one more than the first */
-        /* word of the divisor.  If the trial quotient turns out to */
-        /* be too low, subsequent iterations will inherit a larger */
-        /* remainder in the next trial division. */
-        trialdividend += remainder     [wordoffset];
-        trialdivisor   = divisorshifted[wordoffset] + 1UL;
-        trialquotient  = trialdividend / trialdivisor;
-        trialremainder = trialdividend % trialdivisor;
+    /* Work out at which word in quotient the result will begin */
+    pquotienthi = quotient + (bi1[1] ? 1 : 2) + (pdivisorlo-pdivisorhi);
+    pquotientlo = quotient + bi1size - 1;
+    dividendcarry = 0;
+    /* Calculate one word of the quotient per loop */
+    while (pquotienthi<=pquotientlo) {
+        /* To avoid comparing all the words of the divisor, perform a */
+        /* trial division of dividendcarry by the first word of the */
+        /* divisor plus one. */
+        dividendcarry += * pdividendhi;
+        trialquotientmin = dividendcarry / trialdivisor;
+        while (trialquotientmin) {
+            #ifdef BIGGISHINT_TRACE
+                fprintf(stdout,"carry(%ld) %x dividendcarry %lx/%lx=%lx\n",
+                    pdividendhi-dividend, * pdividendhi, dividendcarry,
+                    trialdivisor, trialquotientmin);
+                fprintf(stdout,"  quotient %s%04x", (* quotient & 1)?"-":"",
+                    * (pquotient=quotient));
+                while (++pquotient <= pquotientlo)
+                    fprintf(stdout,"_%04x", * pquotient);
+                fprintf(stdout," at %p hi %+ld lo %+ld\n",
+                    quotient, pquotienthi-quotient, pquotientlo-quotient);
+            #endif
 
-#include <stdio.h>
-    fprintf(stdout,"\ttdividend %#x tdivisor %#x tquotient %#x tremainder %#x\n\twordoffset %#x\n"
-        ,trialdividend, trialdivisor, trialquotient, trialremainder
-        ,wordoffset);
+            /* Subtract shifted trialquotient*divisor from dividend. */
+            tempquotient = trialquotientmin;
+            divisorshift = 0;
+            while (tempquotient) {
+                pdividend = pdividendhi + (pdivisorlo - pdivisorhi) - divisorshift++;
+                #ifdef BIGGISHINT_TRACE
+                    fprintf(stdout,"    tempquotient %lx pdividend %+ld\n",
+                        tempquotient, pdividend-dividend);
+                #endif
+                /* Use tempquotient1 to subtract successive words of */
+                /* divisor multiplied by tempquotient2 from dividend. */
+                quotientcarry = 0UL;
+                for (pdivisor=pdivisorlo; pdivisor>=pdivisorhi; --pdivisor) {
+                    quotientcarry += (* pdivisor) * (tempquotient & 0xffff);
+                    dividendword1 = (* pdividend);
+                    dividendword2 = quotientcarry & 0xffff;
+                    #ifdef BIGGISHINT_TRACE
+                        fprintf(stdout,"      dividend[%ld] = %04x-%04x = ",
+                            pdividend-dividend, dividendword1, dividendword2);
+                    #endif
+                    if (dividendword1 >= dividendword2)  /* just subtract */
+                        dividendword1 -= dividendword2;
+                    else {                       /* borrow, then subtract */
+                        dividendword1   = 0x10000UL + dividendword1 - dividendword2;
+                        quotientcarry += 0x10000UL;
+                    }
+                    #ifdef BIGGISHINT_TRACE
+                        fprintf(stdout,"%04x tempquotient1 %lx\n",
+                             dividendword1, quotientcarry);
+                    #endif
+                    * pdividend-- = dividendword1;
+                    quotientcarry>>=16;
+                }
+                assert( quotientcarry <= 0xffff ); /* no loop required */
+                if (quotientcarry) {
+                    #ifdef BIGGISHINT_TRACE
+                        fprintf(stdout,"      dividend[%ld] = %04x-%04lx = ",
+                            pdividend-dividend, * pdividend, quotientcarry);
+                    #endif
+                    (* pdividend) -= (unsigned short) quotientcarry;
+                    #ifdef BIGGISHINT_TRACE
+                        fprintf(stdout,"%04x\n", * pdividend);
+                    #endif
+                }
+                tempquotient >>= 16;
+            } /* Subtracting shifted trialquotient*divisor from dividend */
 
-        divisormultiplied = biggishint_internal_shortmultiply(divisorshifted, trialquotient);
-        remainder_temp = remainder;
-//      remainder = biggishint_internal_addsubtract(remainder,divisormultiplied,1);
-//      free(remainder_temp);
-        /* Add the partial quotient to the accumulating result */
-        * ++pquotient = (unsigned short) trialquotient;
-        free(divisormultiplied);
+            /* Add shifted trialquotient to quotient */
+            tempquotient = trialquotientmin;
+            pquotient = pquotienthi;
+            while (tempquotient) {
+                tempquotient += * pquotient;
+                * pquotient-- = tempquotient & 0xffff;
+                tempquotient >>= 16;
+            }
+
+            /* Make a new dividendcarry from dividend. */
+            /* TODO: use assert() to check whether a loop is really needed */
+            dividendcarry = 0;
+            for (pdividend=dividend+1; pdividend<=pdividendhi; ++pdividend ) {
+                dividendcarry = (dividendcarry<<16) + (* pdividend);
+            }
+            trialquotientmin = dividendcarry / trialdivisor;
+        }  /* while (trialquotientmin > 0) */
+
+        #ifdef BIGGISHINT_TRACE
+        fprintf(stdout,"  dividend %s%04x", (* dividend & 1)?"-":"",
+            * (pdividend=dividend));
+        while (++pdividend <= pdividendlo)
+            fprintf(stdout,"_%04x", * pdividend);
+        fprintf(stdout," at %p hi %+ld lo %+ld\n",
+            dividend, pdividendhi-dividend, pdividendlo-dividend);
+        #endif
+
+        /* Proceed to the next word in the quotient and dividend */
+        dividendcarry <<= 16;
+        ++pquotienthi;
+        ++pdividendhi;
     }
-    free(divisorshifted);
-    free(remainder);
+
+    #ifdef BIGGISHINT_TRACE
+    fprintf(stdout,"  quotient %s%04x", (* quotient & 1)?"-":"",
+        * (pquotient=quotient));
+    while (++pquotient <= pquotientlo)
+        fprintf(stdout,"_%04x", * pquotient);
+    fprintf(stdout," at %p hi %+ld lo %+ld\n",
+        quotient, pquotienthi-quotient, pquotientlo-quotient);
+    #endif
+
+    /* Subtract (trialquotient2*divisor) from dividend. */
+    pdividend = pdividendlo;
+    #ifdef BIGGISHINT_TRACE
+    fprintf(stdout,"    trialquotientmin %lx pdividend %+ld\n",
+        trialquotientmin, pdividend-dividend);
+    #endif
+    /* Try to subtract the divisor from the dividend (this is the */
+    /* only time divisor is used instead of leading word of divisor */
+    /* + 1. */
+    dividendcarry = 0;
+    while (biggishint_internal_comparemagnitude(dividend, divisor) >= 0) {
+        pdividend = pdividendlo;
+        dividendword2 = 0;  /* used as the borrow word in subtraction */
+        for (pdivisor=pdivisorlo; pdivisor>=pdivisorhi; --pdivisor) {
+            dividendword1 = * pdividend;
+            if ((unsigned long) dividendword1 >= (unsigned long) * pdivisor + dividendword2) {
+                /* just subtract */
+                dividendword1 -= * pdivisor + dividendword2;
+                dividendword2 = 0;
+            }
+            else {  /* borrow, then subtract */
+                dividendword1 = (unsigned long) dividendword1 - * pdivisor + dividendword2;
+                dividendword2 = 1;
+            }
+            * pdividend-- = dividendword1;
+        }
+//      unsigned short * dividend_temp = dividend;
+//      dividend = biggishint_internal_addsubtract(dividend_temp, divisor, 1);
+//      free(dividend_temp);
+        ++dividendcarry;
+    }
+    #ifdef BIGGISHINT_TRACE
+    fprintf(stdout,"final dividendcarry %lx\n", dividendcarry);
+    #endif
+    assert( dividendcarry <= 1 );
+    pquotient = pquotientlo;
+    while (dividendcarry && (pquotient>quotient)){
+        dividendcarry += * pquotient;
+        * pquotient-- = dividendcarry & 0xffff;
+        dividendcarry >>= 16;
+    }
+
+    free(dividend);
     return biggishint_internal_trim(&quotient);
 }
 
@@ -263,9 +389,7 @@ biggishintFromDecimalString(char * str)
     * bi1 = 4 | sign;
     /* take one digit at a time, convert to binary, accumulate values */
     while ( isdigit(c = * ps++) ) {
-        bi2 = biggishint_internal_shortmultiply(bi1, 10);
-        free(bi1);
-        bi1 = bi2;
+        biggishint_internal_shortmultiply(&bi1, 10);
         digitvalue[1] = c - '0';
         bi2 = biggishint_internal_addsubtract(bi1, digitvalue, 0);
         free(bi1);
@@ -355,13 +479,15 @@ biggishintMultiply(unsigned short * bi1, unsigned short * bi2)
     bi1size = (* bi1 & 0xfffc) >> 1;
     bi2size = (* bi2 & 0xfffc) >> 1;
     if (bi1size == 2) {
-        result = biggishint_internal_shortmultiply(bi2, bi1[1]);
+        result = biggishint_internal_clone(bi2);
         * result &= 0xfffe;  /* clear the sign bit */
+        biggishint_internal_shortmultiply(&result, bi1[1]);
     }
     else {
         if (bi2size == 2) {
-            result = biggishint_internal_shortmultiply(bi1, bi2[1]);
+            result = biggishint_internal_clone(bi1);
             * result &= 0xfffe;  /* clear the sign bit */
+            biggishint_internal_shortmultiply(&result, bi2[1]);
         }
         else { /* both bi1 and bi2 are more than 16 bit numbers */
             /* Create a result array that is large enough for any */
@@ -509,7 +635,8 @@ biggishintToHexadecimalString(unsigned short * bi1)
 
 
 /* biggishint_internal_addsubtract */
-unsigned short * biggishint_internal_addsubtract(unsigned short * bi1, unsigned short * bi2, int flipsign2)
+unsigned short * biggishint_internal_addsubtract(unsigned short * bi1,
+                                    unsigned short * bi2, int flipsign2)
 {
     unsigned short bi1size, bi2size, res1size, res2size, resultsize;
     unsigned short * result1, * result2, * larger, * smaller, * p1, * p2;
@@ -715,41 +842,40 @@ biggishint_internal_shortdivide(unsigned short * bi1, unsigned short * i2)
 
 
 /* biggishint_internal_shortmultiply */
-/* TODO: change the API to ** bi1, to enable in-place multiplication */
-unsigned short *
-biggishint_internal_shortmultiply(unsigned short * bi1, unsigned short multiplier)
+void
+biggishint_internal_shortmultiply(unsigned short ** bi1, unsigned short multiplier)
 {
     unsigned short bi1size, productsize, * product, * pi, * pp;
-    unsigned long partialproduct;
+    unsigned long productcarry;
     if (multiplier == 0) {
-        product = (unsigned short *) calloc(2, sizeof(short));
-        * product = 4;
+        * bi1 = realloc(* bi1, sizeof(short)<<1);
+        (* bi1)[0] = 4;  (* bi1)[1] = 0;
     }
     else {
-        if (multiplier == 1) {
-            product = biggishint_internal_clone(bi1);
-        }
-        else {
-            bi1size   = (* bi1 & 0xfffc) >> 1;
+        if (multiplier != 1) {
+            /* TODO: avoid realloc if possible */
+            bi1size   = (** bi1 & 0xfffc) >> 1;
             productsize = bi1size + 2;  /* even number of words */
             product = (unsigned short *) calloc(productsize, sizeof(short));
             * product = productsize << 1;
-            pi = bi1     + bi1size     - 1;
+            pi = * bi1   + bi1size     - 1;
             pp = product + productsize - 1;
-            partialproduct = 0;
+            productcarry = 0;
             do {
-                partialproduct += (* pi--) * (unsigned int)multiplier;
-                (* pp--) = (unsigned short) partialproduct;
-                partialproduct >>= 16;
-            } while ( pi > bi1 );
-            assert( partialproduct < 0xffffffff );
-            while (partialproduct) {
-                (* pp--) = (unsigned short) partialproduct;
-                partialproduct >>= 16;
+                productcarry += (* pi--) * (unsigned int)multiplier;
+                (* pp--) = (unsigned short) productcarry;
+                productcarry >>= 16;
+            } while ( pi > * bi1 );
+            assert( productcarry < 0xffffffff );
+            while (productcarry) {
+                (* pp--) = (unsigned short) productcarry;
+                productcarry >>= 16;
             }
+            free(* bi1);
+            * bi1 = product;
+            biggishint_internal_trim(bi1);
         }
     }
-    return biggishint_internal_trim(&product);
 }
 
 
