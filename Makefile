@@ -1,6 +1,6 @@
 # Makefile for zavolaj's NativeCall.pm
 
-# targets that do not produce files
+# Targets that do not produce files
 .PHONY: clean test help install install-user uninstall \
 	uninstall-user
 
@@ -14,7 +14,7 @@ TEST_F    = $(PERL_EXE) -MExtUtils::Command -e test_f
 LIBSYSTEM = $(shell $(PERL6_EXE) -e 'print @*INC[1]')
 LIBUSER   = $(shell $(PERL6_EXE) -e 'print @*INC[0]')
 
-# first the default target
+# First the default target
 lib/NativeCall.pir: lib/NativeCall.pm6
 	$(PERL6_EXE) --target=pir --output=lib/NativeCall.pir lib/NativeCall.pm6
 
@@ -26,15 +26,16 @@ lib/libzavolajtest.so: lib/libzavolajtest.c lib/libzavolajtest.h
 lib/libzavolajtest.dll: lib/libzavolajtest.c lib/libzavolajtest.h
 	cc -o lib/libzavolajtest.o -fPIC -c lib/libzavolajtest.c
 	cc -shared -o lib/libzavolajtest.so lib/libzavolajtest.o
+	cc -shared -o lib/libzavolajtest.dylib lib/libzavolajtest.o # just do it again for OS X
 
 clean:
 	@# delete compiled files
-	$(RM_F) lib/*.pir lib/*.o lib/*.so
+	$(RM_F) lib/*.pir lib/*.o lib/*.so lib/*.dylib
 	@# delete all editor backup files
 	$(RM_F) *~ lib/*~ t/*~ t/lib/*~
 
 test: lib/NativeCall.pir lib/libzavolajtest.so
-	env PERL6LIB=lib LD_LIBRARY_PATH=lib prove -e $(PERL6_EXE) -r t/
+	env PERL6LIB=lib LD_LIBRARY_PATH=lib DYLD_LIBRARY_PATH=lib prove -e $(PERL6_EXE) -r t/
 
 # standard install is to the shared system wide directory
 install: lib/NativeCall.pir
