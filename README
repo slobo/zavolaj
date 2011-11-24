@@ -1,26 +1,15 @@
 Zavolaj!
 
-This project prototypes native calling interface functionality for
-Rakudo.  It should give Rakudo the ability to call out to C libraries
-without having to drop to writing PIR).  The Parrot Native Call
-Interface gives a similar facility in PIR.
+This module implements native calling support for Rakudo Perl 6. It builds
+on a set of native calling primitives in NQP, adding mapping of Perl 6
+signatures and various other traits to make working with native libraries
+an easier experience.
 
 The project name is the Slovak translation of the imperative "call!", to
 complement Blizkost, a Rakudo-to-Perl-5 integration project.
 
-The functions that Zavolaj can currently call must have signatures (the
-type of the return value and the types of the arguments) that already
-exist in a fixed list inside Parrot, where they are called 'thunks'.
-There are two source files used to create the list, core_thunks.nci and
-extra_thunks.nci.  Adding more signatures currently involves adding
-entries to the parrot/src/nci/extra_thunks.nci file, see
-https://github.com/parrot/parrot/blob/master/src/nci/extra_thunks.nci.
-After a refactor in March 2011, core_thunks.nci contains only comments.
-
-There is a project to enable calling all possible function signatures:
-http://github.com/plobsing/parrot-libjit-fb is currently a Parrot
-extension.  Zavolaj does not use it yet.  This page shows the status:
-https://github.com/parrot/parrot/blob/master/src/nci/framebuilder.pod
+Thanks for NQP's underlying use of the dyncall library, Zavolaj can now
+support arbitrary signatures.
 
 MySQL
 
