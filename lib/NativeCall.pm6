@@ -1,120 +1,80 @@
-class OpaquePointer { }
+module NativeCall;
 
-class NativeArray {
-    has $!unmanaged;
-    has $!of;
-    has $!max-index = -1;
+# Throwaway type just to get us some way to get at the NativeCall
+# representation.
+my class native_callsite is repr('NativeCall') { }
 
-    method postcircumfix:<[ ]>($idx) {
-        if $idx > $!max-index {
-            self!update-desc-to-index($idx);
-        }
-        Q:PIR {
-            $P0 = find_lex 'self'
-            $P0 = getattribute $P0, '$!unmanaged'
-            $P1 = find_lex '$idx'
-            $S0 = $P0[$P1]
-            %r = box $S0
-        };
-    }
-
-    method !update-desc-to-index($idx) {
-        my $fpa = pir::new__Ps('ResizableIntegerArray');
-        my $typeid;
-        given $!of {
-            when Str { $typeid = 30 }
-            when Int { $typeid = 7 }
-            when Num { $typeid = 16 }
-            default { die "Unknown type"; }
-        }
-        Q:PIR {
-            $P0 = find_lex '$fpa'
-            $P1 = find_lex '$typeid'
-            $P2 = find_lex '$idx'
-            $I0 = $P2
-            inc $I0
-            $I1 = 0
-            $I2 = $P1
-          loop:
-            if $I1 > $I0 goto loop_end
-            push $P0, $I2
-            push $P0, 1
-            push $P0,  0
-            inc $I1
-            goto loop
-          loop_end:
-        };
-        pir::assign__vPP(pir::descalarref__PP($!unmanaged), $fpa);
-    }
-
-    method Bool() {
-        Q:PIR {
-            $P0 = find_lex 'self'
-            $P0 = getattribute $P0, '$!unmanaged'  # a Parrot UnManagedStruct
-            $I0 = defined $P0
-            %r = box $I0
-        } ?? Bool::True !! Bool::False;
-    }
+# Builds a hash of type information for the specified parameter.
+sub param_hash_for(Parameter $p) {
+    my Mu $result := nqp::hash();
+    nqp::bindkey($result, 'type', nqp::unbox_s(type_code_for($p.type)));
+    $result
 }
 
-our sub map-type-to-sig-char(Mu $type) {
-    given $type {
-        when Int           { 'i' }
-        when Str           { 't' }
-        when Num           { 'd' }
-        when Rat           { 'd' }
-        when OpaquePointer { 'p' }
-        when Positional    { 'p' }
-        default { die "Can not handle type " ~ $_.perl ~ " in an 'is native' signature." }
-    }
+# Builds a hash of type information for the specified return type.
+sub return_hash_for(Mu ::T) {
+    my Mu $result := nqp::hash();
+    nqp::bindkey($result, 'type',
+        T =:= Mu ?? 'void' !! nqp::unbox_s(type_code_for(T)));
+    $result
 }
 
-our sub perl6-sig-to-backend-sig(Routine $r) {
-    my $sig-string = $r.returns === Mu ?? 'v' !! map-type-to-sig-char($r.returns());
-    my @params = $r.signature.params();
-    for @params -> $p {
-        $sig-string = $sig-string ~ map-type-to-sig-char($p.type);
-    }
-    return $sig-string;
+# Gets the NCI type code to use based on a given Perl 6 type.
+my %type_map =
+    'int8'  => 'char',
+    'int16' => 'short',
+    'int32' => 'int',
+    'int'   => 'long',
+    'Int'   => 'longlong',
+    'num32' => 'float',
+    'num64' => 'double',
+    'num'   => 'double',
+    'Num'   => 'double',
+    'Str'   => 'utf8str';
+sub type_code_for(Mu ::T) {
+    return %type_map{T.^name}
+        if %type_map.exists(T.^name);
+    die "Unknown type {T.^name} used in native call";
 }
 
-our sub make-mapper(Mu $type) {
-    given $type {
-        when Positional {
-            -> \$unmanaged-struct {
-                NativeArray.new(unmanaged => $unmanaged-struct, of => $type.of)
+# This role is mixed in to any routine that is marked as being a
+# native call.
+my role Native[Routine $r, Str $libname] {
+    has int $!setup;
+    has native_callsite $!call is box_target;
+    
+    method postcircumfix:<( )>($args) {
+        unless $!setup {
+            my Mu $arg_info := nqp::list();
+            for $r.signature.params -> $p {
+                nqp::push($arg_info, param_hash_for($p))
             }
+            my str $conv = self.?native_call_convention || '';
+            nqp::buildnativecall(self,
+                nqp::unbox_s($libname),     # library name
+                nqp::unbox_s($r.name),      # symbol to call
+                nqp::unbox_s($conv),        # calling convention
+                $arg_info,
+                return_hash_for($r.returns));
+            $!setup = 1;
         }
-        default { -> \$x { $x } }
+        nqp::nativecall(nqp::p6decont($r.returns), self,
+            nqp::getattr(nqp::p6decont($args), Capture, '$!list'))
     }
 }
 
-our $ncifunc = Q:PIR {
-    load_bytecode 'NCI/Utils.pbc'
-    %r = get_root_global ['parrot';'NCI';'Utils'], 'ncifunc'
-};
-
-our multi trait_mod:<is>(Routine $r, $libname?, :$native!) {
-    my $entry-point   = $r.name();
-    my $call-sig      = perl6-sig-to-backend-sig($r);
-    my $return-mapper = make-mapper($r.returns);
-    my $lib;
-    if $libname ne '' {
-        $lib = pir::loadlib__Ps($libname);
-        # $*ERR.say: "routine $r.name() signature $call-sig";
-        unless $lib {
-            die "The native library '$libname' required for '$entry-point' could not be located";
-        }
-    }
-    pir::setattribute__vPsP($r, '$!do', -> |$c {
-        $return-mapper(
-            pir::descalarref__PP( ($ncifunc(
-                ($lib ?? pir::descalarref__PP($lib) !! pir::null__P()),
-                $entry-point,
-                $call-sig
-                ) // die("Could not locate symbol '$entry-point' in native library '{$libname || q<(resident)>}'")
-            ).(|$c) )
-        )
-    });
+# Role for carrying extra calling convention information.
+my role NativeCallingConvention[$name] {
+    method native_call_convention() { $name };
 }
 
+# Specifies that the routine is actually a native call, and gives
+# the name of the library to load it from.
+multi trait_mod:<is>(Routine $r, $libname, :$native!) is export {
+    $r does Native[$r, $libname];
+}
+
+# Specifies the calling convention to use for a native call.
+multi trait_mod:<is>(Routine $r, $name, :$nativeconv!) is export {
+    $r does NativeCallingConvention[$name];
+}
