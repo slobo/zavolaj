@@ -34,7 +34,11 @@ my %type_map =
 sub type_code_for(Mu ::T) {
     return %type_map{T.^name}
         if %type_map.exists(T.^name);
-    die "Unknown type {T.^name} used in native call";
+    return 'cstruct'
+        if T.REPR eq 'CStruct';
+    die "Unknown type {T.^name} used in native call.\n" ~
+        "If you want to pass a struct, be sure to use the CStruct representation.\n" ~
+        "If you want to pass an array, be sure to use the CArray type.";
 }
 
 # This role is mixed in to any routine that is marked as being a
