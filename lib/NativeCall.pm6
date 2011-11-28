@@ -61,6 +61,8 @@ sub type_code_for(Mu ::T) {
         if %type_map.exists(T.^name);
     return 'cstruct'
         if T.REPR eq 'CStruct';
+    return 'cpointer'
+        if T.REPR eq 'CPointer';
     die "Unknown type {T.^name} used in native call.\n" ~
         "If you want to pass a struct, be sure to use the CStruct representation.\n" ~
         "If you want to pass an array, be sure to use the CArray type.";
@@ -101,6 +103,9 @@ my role NativeCallingConvention[$name] {
 my role NativeCallEncoded[$name] {
     method native_call_encoded() { $name };
 }
+
+# Expose an OpaquePointer class for working with raw pointers.
+my class OpaquePointer is export is repr('CPointer') { }
 
 # Specifies that the routine is actually a native call, and gives
 # the name of the library to load it from.
