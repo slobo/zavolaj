@@ -1,17 +1,11 @@
-A few ideas:
-
-- Automatic handling of nulls
-    Passing in an undefined type object should turn into a pir::null__P and
-    vice-versa for return values (null pointer --> undefined object), when it
-    makes sense to do so.
-
-- OpaquePointer that behaves like a real object
-    Subclassing, methods and so on, which would let us do things like this
-    (hypothetically):
-
-        class Database::Connection is OpaquePointer {
-            sub DESTROY {
-                # rollback unfinished transactions, disconnect, etc.
-                native_db_cleanup_function(self);
-            }
-        }
+Here's some of the things that remaing to be done
+* Basic array support
+* Awesome Documentation
+* Get the tests in shape
+* Support strings in structs
+* Support arrays of strings
+* is native() to look things up in the current executable's space
+* Properly support sized types in structs and arrays
+* Support pointers in structs
+* Support arrays of structs and pointers
+* Support callbacks
