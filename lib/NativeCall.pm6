@@ -63,6 +63,8 @@ sub type_code_for(Mu ::T) {
         if T.REPR eq 'CStruct';
     return 'cpointer'
         if T.REPR eq 'CPointer';
+    return 'carray'
+        if T.REPR eq 'CArray';
     die "Unknown type {T.^name} used in native call.\n" ~
         "If you want to pass a struct, be sure to use the CStruct representation.\n" ~
         "If you want to pass an array, be sure to use the CArray type.";
@@ -106,6 +108,35 @@ my role NativeCallEncoded[$name] {
 
 # Expose an OpaquePointer class for working with raw pointers.
 my class OpaquePointer is export is repr('CPointer') { }
+
+# CArray class, used to represent C arrays.
+my class CArray is export is repr('CArray') {
+    method at_pos($pos) { die "CArray cannot be used without a type" }
+    
+    my role IntTypedCArray[::TValue] does Positional[TValue] {
+        multi method at_pos($pos) {
+            nqp::r_atpos_i(self, nqp::unbox_i($pos.Int))
+        }
+        multi method at_pos(int $pos) {
+            nqp::r_atpos_i(self, $pos)
+        }
+    }
+    multi method PARAMETERIZE_TYPE(Int:U $t) {
+        self but IntTypedCArray[$t.WHAT]
+    }
+    
+    my role NumTypedCArray[::TValue] does Positional[TValue] {
+        multi method at_pos($pos) {
+            nqp::r_atpos_n(self, nqp::unbox_i($pos.Int))
+        }
+        multi method at_pos(int $pos) {
+            nqp::r_atpos_n(self, $pos)
+        }
+    }
+    multi method PARAMETERIZE_TYPE(Num:U $t) {
+        self but NumTypedCArray[$t.WHAT]
+    }
+}
 
 # Specifies that the routine is actually a native call, and gives
 # the name of the library to load it from.
