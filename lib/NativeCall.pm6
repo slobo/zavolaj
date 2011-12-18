@@ -114,11 +114,25 @@ my class CArray is export is repr('CArray') {
     method at_pos($pos) { die "CArray cannot be used without a type" }
     
     my role IntTypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos($pos) {
-            nqp::r_atpos_i(self, nqp::unbox_i($pos.Int))
+        multi method at_pos(\$arr: $pos) is rw {
+            Proxy.new:
+                FETCH => method () {
+                    nqp::p6box_i(nqp::r_atpos_i($arr, nqp::unbox_i($pos.Int)))
+                },
+                STORE => method (int $v) {
+                    nqp::r_bindpos_i($arr, nqp::unbox_i($pos.Int), $v);
+                    self
+                }
         }
-        multi method at_pos(int $pos) {
-            nqp::r_atpos_i(self, $pos)
+        multi method at_pos(\$arr: int $pos) is rw {
+            Proxy.new:
+                FETCH => method () {
+                    nqp::p6box_i(nqp::r_atpos_i($arr, $pos))
+                },
+                STORE => method (int $v) {
+                    nqp::r_bindpos_i($arr, $pos, $v);
+                    self
+                }
         }
     }
     multi method PARAMETERIZE_TYPE(Int:U $t) {
@@ -126,11 +140,25 @@ my class CArray is export is repr('CArray') {
     }
     
     my role NumTypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos($pos) {
-            nqp::r_atpos_n(self, nqp::unbox_i($pos.Int))
+        multi method at_pos(\$arr: $pos) is rw {
+            Proxy.new:
+                FETCH => method () {
+                    nqp::p6box_n(nqp::r_atpos_n($arr, nqp::unbox_i($pos.Int)))
+                },
+                STORE => method (num $v) {
+                    nqp::r_bindpos_n($arr, nqp::unbox_i($pos.Int), $v);
+                    self
+                }
         }
-        multi method at_pos(int $pos) {
-            nqp::r_atpos_n(self, $pos)
+        multi method at_pos(\$arr: int $pos) is rw {
+            Proxy.new:
+                FETCH => method () {
+                    nqp::p6box_n(nqp::r_atpos_n($arr, $pos))
+                },
+                STORE => method (num $v) {
+                    nqp::r_bindpos_n($arr, $pos, $v);
+                    self
+                }
         }
     }
     multi method PARAMETERIZE_TYPE(Num:U $t) {
