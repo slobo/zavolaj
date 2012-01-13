@@ -175,6 +175,34 @@ my class CArray is export is repr('CArray') {
     multi method PARAMETERIZE_TYPE(Num:U $t) {
         self but NumTypedCArray[$t.WHAT]
     }
+    
+    my role TypedCArray[::TValue] does Positional[TValue] {
+        multi method at_pos(\$arr: $pos) is rw {
+            Proxy.new:
+                FETCH => method () {
+                    nqp::r_atpos($arr, nqp::unbox_i($pos.Int))
+                },
+                STORE => method ($v) {
+                    nqp::r_bindpos($arr, nqp::unbox_i($pos.Int), nqp::p6decont($v));
+                    self
+                }
+        }
+        multi method at_pos(\$arr: int $pos) is rw {
+            Proxy.new:
+                FETCH => method () {
+                    nqp::r_atpos($arr, $pos)
+                },
+                STORE => method ($v) {
+                    nqp::r_bindpos($arr, $pos, nqp::p6decont($v));
+                    self
+                }
+        }
+    }
+    multi method PARAMETERIZE_TYPE(Mu:U $t) {
+        die "A C array can only hold integers, numbers, strings, CStructs, CPointers or CArrays (not $t.perl())"
+            unless $t === Str || $t.REPR eq 'CStruct' | 'CPointer' | 'CArray';
+        self but TypedCArray[$t.WHAT]
+    }
 }
 
 # Specifies that the routine is actually a native call, and gives
