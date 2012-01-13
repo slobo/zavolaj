@@ -44,3 +44,26 @@ DLLEXPORT void AssortedIntArgs(int x, short y, char z)
         printf("not ok 6 - got passed char 103\n", x);
     fflush(stdout);
 }
+
+DLLEXPORT void TakeADouble(double x)
+{
+    if (-6.9 - x < 0.001)
+        printf("ok 7 - got passed double -6.9\n", x);
+    else
+        printf("not ok 7 - got passed double -6.9\n", x);
+}
+
+DLLEXPORT void TakeAFloat(float x)
+{
+    if (4.2 - x < 0.001)
+        printf("ok 8 - got passed float 4.2\n", x);
+    else
+        printf("not ok 8 - got passed float 4.2\n", x);
+}
+
+DLLEXPORT void TakeAString(char *pass_msg)
+{
+    printf("%s\n", pass_msg);
+}
+
+
