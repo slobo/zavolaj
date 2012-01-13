@@ -70,6 +70,12 @@ sub type_code_for(Mu ::T) {
         "If you want to pass an array, be sure to use the CArray type.";
 }
 
+sub map_return_type($type) {
+    $type === int8 || $type === int16 || $type === int32 || $type === int ?? Int !!
+    $type === num32 || $type === num64 || $type === num                   ?? Num !!
+                                                                             $type
+}
+
 # This role is mixed in to any routine that is marked as being a
 # native call.
 my role Native[Routine $r, Str $libname] {
@@ -95,7 +101,7 @@ my role Native[Routine $r, Str $libname] {
                 return_hash_for($r));
             $!setup = 1;
         }
-        nqp::nativecall(nqp::p6decont($r.returns), self,
+        nqp::nativecall(nqp::p6decont(map_return_type($r.returns)), self,
             nqp::getattr(nqp::p6decont($args), Capture, '$!list'))
     }
 }
