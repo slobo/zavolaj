@@ -70,7 +70,8 @@ sub type_code_for(Mu ::T) {
         "If you want to pass an array, be sure to use the CArray type.";
 }
 
-sub map_return_type($type) {
+multi sub map_return_type(Mu $type) { Mu }
+multi sub map_return_type($type) {
     $type === int8 || $type === int16 || $type === int32 || $type === int ?? Int !!
     $type === num32 || $type === num64 || $type === num                   ?? Num !!
                                                                              $type
