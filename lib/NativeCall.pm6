@@ -83,9 +83,10 @@ my role Native[Routine $r, Str $libname] {
                 nqp::push($arg_info, param_hash_for($p))
             }
             my str $conv = self.?native_call_convention || '';
-            my $realname = $libname && $libname !~~ /\.\w+$/ ??
-                "$libname$*VM<config><load_ext>" !!
-                $libname;
+            my $realname = 
+                !$libname.DEFINITE   ?? "" !!
+                $libname ~~ /\.\w+$/ ?? $libname !!
+                                        "$libname$*VM<config><load_ext>";
             nqp::buildnativecall(self,
                 nqp::unbox_s($realname),    # library name
                 nqp::unbox_s($r.name),      # symbol to call
