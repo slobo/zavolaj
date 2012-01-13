@@ -175,6 +175,12 @@ multi trait_mod:<is>(Routine $r, $libname, :$native!) is export {
     $r does Native[$r, $libname];
 }
 
+# Specifies that the routine is actually a native call, into the
+# current executable (platform specific).
+multi trait_mod:<is>(Routine $r, :$native!) is export {
+    $r does Native[$r, Str];
+}
+
 # Specifies the calling convention to use for a native call.
 multi trait_mod:<is>(Routine $r, $name, :$nativeconv!) is export {
     $r does NativeCallingConvention[$name];
