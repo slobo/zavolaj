@@ -1,8 +1,8 @@
 use NativeCall;
 
-sub MessageBoxA(int32 $phWnd, Str $message, Str $caption, int32 $flags)
+sub MessageBoxA(Int, Str, Str, Int)
     returns Int
-    is native('user32')
-    { ... }
+    is native('user32.dll')
+    { * }
 
 MessageBoxA(0, "We can haz NCI?", "oh lol", 64);
