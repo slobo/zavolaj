@@ -31,5 +31,5 @@ DLLEXPORT char ** ReturnAStringArray()
 
 DLLEXPORT int TakeAStringArrayAndReturnTotalLength(char **arr)
 {
-    return strlen(arr[0]) + strlen(arr[1]);
+    return (int)(strlen(arr[0]) + strlen(arr[1]));
 }
