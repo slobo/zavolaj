@@ -67,6 +67,41 @@ routine itself.
     sub input_box() returns Str is encoded('utf8') is native('libgui') { * }
 
 
+## Opaque Pointers
+Sometimes you need to get a pointer (for example, a library handle) back from a
+C library. You don't care about what it points to - you just need to keep hold
+of it. The OpaquePointer type provides for this.
+
+    sub Foo_init() returns OpaquePointer is native("libfoo") { * }
+    sub Foo_free(OpaquePointer) is native("libfoo") { * }
+
+This works out OK, but you may fancy working with a type named something better
+than OpaquePointer. It turns out that any class with the representation "CPointer"
+can serve this role. This means you can expose libraries that work on handles
+by writing a class like this:
+
+    class FooHandle is repr('CPointer') {
+        # Here are the actual Zavolaj functions.
+        sub Foo_init() returns FooPointer is native("libfoo") { * }
+        sub Foo_free(FooPointer) is native("libfoo") { * }
+        
+        # Here are the methods we use to expose it to the outside world.
+        method new() { Foo_init() }
+        method free() { Foo_free(self) }
+    }
+
+Note that the CPointer representation can do nothing more than hold a C pointer.
+This means that your class cannot have extra attributes. However, for simple
+libraries this may be a neat way to expose an object oriented interface to it.
+
+Of course, you can always have an empty class:
+
+    class DoorHandle is repr('CPointer') { }
+
+And just use the class as you would use OpaquePointer, but with potential for
+better type safety and more readable code.
+
+
 ## Running the Examples
 
 The examples directory contains various examples of how to use Zavolaj.
