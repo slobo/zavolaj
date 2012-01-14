@@ -1,10 +1,8 @@
 Here's some of the things that remaing to be done
 * Awesome Documentation
-* Get the tests in shape
 * Support strings in structs
-* Support arrays of strings
-* is native() to look things up in the current executable's space
-* Properly support sized types in structs and arrays
+* Properly support sized types in structs
+* Properly support sized types in arrays
 * Support pointers in structs
 * Support arrays of structs and pointers
 * Support callbacks
