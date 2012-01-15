@@ -133,7 +133,7 @@ are putting the values into a Perl 6 array, and it will not work out. If this
 all freaks you out, forget you ever knew anything about the "@" sigil and just
 use "$" all the way when using Zavolaj. :-)
 
-    my $titles := CArray[Str].new();
+    my $titles = CArray[Str].new();
     $titles[0] = 'Me';
     $titles[1] = 'You';
     $titles[2] = 'Your Mom';
