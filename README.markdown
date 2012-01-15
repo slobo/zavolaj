@@ -66,6 +66,8 @@ routine itself.
 
     sub input_box() returns Str is encoded('utf8') is native('libgui') { * }
 
+Note that a null string can be passed by passing the Str type object; a null
+return will also be represented by the type object.
 
 ## Opaque Pointers
 Sometimes you need to get a pointer (for example, a library handle) back from a
@@ -101,6 +103,94 @@ Of course, you can always have an empty class:
 And just use the class as you would use OpaquePointer, but with potential for
 better type safety and more readable code.
 
+Once again, type objects are used to represent nulls.
+
+## Arrays
+Zavolaj currently has some basic support for arrays. It is constrained to only
+working with machine-size integers, doubles and strings at the moment; the sized
+numeric types, arrays of pointers, arrays of structs and arrays of arrays are in
+development.
+
+Perl 6 arrays, which support amongst other things laziness, are laid out in memory
+in a radically different way to C arrays. Therefore, the NativeCall library offers
+a much more primitive CArray type, which you must use if working with C arrays.
+
+Here is an example of passing a C array.
+
+    sub RenderBarChart(Str, int, CArray[Str], CArray[num]) is native("libchart") { * }
+    my @titles := CArray[Str].new();
+    @titles[0] = 'Me';
+    @titles[1] = 'You';
+    @titles[2] = 'Your Mom';
+    my @values := CArray[num].new();
+    @values[0] = 59.5e0;
+    @values[1] = 61.2e0;
+    @values[2] = 120.7e0;
+    RenderBarChart('Weights (kg)', 3, @titles, @values);
+
+Note that binding was used to @titles, *NOT* assignment! If you assign, you
+are putting the values into a Perl 6 array, and it will not work out. If this
+all freaks you out, forget you ever knew anything about the "@" sigil and just
+use "$" all the way when using Zavolaj. :-)
+
+    my $titles := CArray[Str].new();
+    $titles[0] = 'Me';
+    $titles[1] = 'You';
+    $titles[2] = 'Your Mom';
+
+Getting return values for arrays works out just the same.
+
+The memory management of arrays is important to understand. When you create an
+array yourself, then you can add elements to it as you wish and it will be
+expanded for you as required. However, this may result in it being moved in
+memory (assignments to existing elements will never cause this, however). This
+means you'd best know what you're doing if you twiddle with an array after passing
+it to a C library.
+
+By contrast, when a C library returns an array to you, then the memory can not
+be managed by Zavolaj, and it doesn't know where the array ends. Presumably,
+something in the library API tells you this (for example, you know that when
+you see a null element, you should read no further). Note that Zavolaj can offer
+you no protection whatsoever here - do the wrong thing, and you will get a
+segfault or cause memory corruption. This isn't a shortcoming of Zavolaj, it's
+the way the big bad native world works. Scared? Here, have a hug. Good luck! :-)
+
+## Structs
+Zavolaj currently has some basic support for arrays. It is constrained to only
+working with machine-size integers, doubles and strings at the moment; structs
+containing sized numeric types, pointers, arrays and pointers to other structs
+are in development.
+
+Thanks to representation polymorphism, it's possible to declare a normal looking
+Perl 6 class that, under the hood, stores its attributes in the same way a C
+compiler would lay them out in a similar struct definition. All it takes is a
+quick use of the "repr" trait:
+
+    class Point is repr('CStruct') {
+        has num64 $.x;
+        has num64 $.y;
+    }
+
+The attributes can only be of the types that Zavolaj knows how to marshall into
+struct fields. Other than that, you can do the usual set of things you would with
+a class; you could even have some of the attributes come from roles or have them
+inherited from another class. Of course, methods are completely fine too. Go wild!
+
+The memory management rules are very much like for arrays, though simpler since a
+struct is never resized. When you create a struct, the memory is managed for you and
+when the variable(s) pointing to the instance of a CStruct go away, the memory will
+be freed when GC gets to it. When a CStruct-based type is used for the return type,
+the memory is not managed for you.
+
+As you may have predicted by now, a null is represented by the type object of the
+struct type.
+
+## The Future
+See the TODO file. In general, though, it's mostly about making arrays and structs
+much more capable, providing more options for memory management and supporting
+callbacks. Something missing that's blocking you? Talk to jnthn on #perl6 - the
+TODO list can be shuffled around to suit what potential users are after. Or just
+send in a patch. ;-)
 
 ## Running the Examples
 
@@ -137,10 +227,10 @@ You can look at the results via a normal mysql connection:
     SHOW TABLES;
     SELECT * FROM nom;
 
-## SQLite3
+### SQLite3
 
 May not be working...let us know if you get success!
 
-## Microsoft Windows
+### Microsoft Windows
 
 The win32-api-call.p6 script shows a Windows API call done from Perl 6.
