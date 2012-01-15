@@ -156,7 +156,7 @@ segfault or cause memory corruption. This isn't a shortcoming of Zavolaj, it's
 the way the big bad native world works. Scared? Here, have a hug. Good luck! :-)
 
 ## Structs
-Zavolaj currently has some basic support for arrays. It is constrained to only
+Zavolaj also has some basic support for structs. It is constrained to only
 working with machine-size integers, doubles and strings at the moment; structs
 containing sized numeric types, pointers, arrays and pointers to other structs
 are in development.
