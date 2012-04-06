@@ -8,4 +8,6 @@
 *.exp
 *.pdb
 *.bundle
+Makefile
+blib/
 *~
