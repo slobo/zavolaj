@@ -14,6 +14,6 @@ DLLEXPORT void * ReturnSomePointer()
 
 DLLEXPORT void TakeSomePointer(void *ptr)
 {
-    printf("%s\n", ptr);
+    printf("%s\n", (char *) ptr);
     fflush(stdout);
 }
