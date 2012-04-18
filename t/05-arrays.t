@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 7;
+plan 8;
 
 compile_test_lib('05-arrays');
 
@@ -31,4 +31,10 @@ compile_test_lib('05-arrays');
     @parr[0] = "OMG";
     @parr[1] = "strings!!!";
     is TakeAStringArrayAndReturnTotalLength(@parr), 13, 'passing string array';
+}
+
+{
+    my @arr := CArray[int].new();
+    @arr[0] = 1;
+    is @arr[0], 1, 'getting last element of managed array';
 }
