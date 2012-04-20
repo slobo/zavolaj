@@ -1,5 +1,4 @@
 *.pir
-*.c
 *.lib
 *.dll
 *.so
