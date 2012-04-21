@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 7;
+plan 12;
 
 compile_test_lib('06-struct');
 
@@ -43,6 +43,7 @@ is $obj.arr[1], 2,     'getting CArray and element';
 # C-side tests:
 
 # NYI:
+skip('NYI: Getting struct from C-land', 5);
 #my $cobj = ReturnAStruct;
 #
 #is $cobj.int,    17,    'getting int from C-created struct';

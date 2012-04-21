@@ -9,9 +9,9 @@
 #endif
 
 typedef struct {
-    int intval;
+    long intval;
     double numval;
-    int *arr;
+    long *arr;
 } MyStruct;
 
 DLLEXPORT MyStruct *ReturnAStruct()
@@ -19,7 +19,7 @@ DLLEXPORT MyStruct *ReturnAStruct()
     MyStruct *obj = (MyStruct *) malloc(sizeof(MyStruct));
     obj->intval = 17;
     obj->numval = 4.2;
-    obj->arr = (int *) malloc(3*sizeof(int));
+    obj->arr = (long *) malloc(3*sizeof(long));
     obj->arr[0] = 2;
     obj->arr[1] = 3;
     obj->arr[2] = 5;
