@@ -21,6 +21,10 @@ typedef struct {
     NumStruct *b;
 } StructStruct;
 
+typedef struct {
+    long *p;
+} PointerStruct;
+
 DLLEXPORT MyStruct *ReturnAStruct()
 {
     MyStruct *obj = (MyStruct *) malloc(sizeof(MyStruct));
@@ -67,4 +71,16 @@ DLLEXPORT void TakeAStructStruct(StructStruct *obj) {
     printf("ok - int 1 in struct 2 in struct\n");
     if(!obj->b || obj->b->second != 3.14) printf("not ");
     printf("ok - int 2 in struct 2 in struct\n");
+}
+
+DLLEXPORT PointerStruct *ReturnAPointerStruct() {
+    PointerStruct *obj = (PointerStruct *) malloc(sizeof(PointerStruct));
+    obj->p = (long *) malloc(sizeof(long));
+    *(obj->p) = 19;
+
+    return obj;
+}
+
+DLLEXPORT long _deref(long *ptr) {
+    return *ptr;
 }

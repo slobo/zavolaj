@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 20;
+plan 21;
 
 compile_test_lib('06-struct');
 
@@ -64,11 +64,22 @@ class StructStruct is repr('CStruct') {
     }
 }
 
+class PointerThing is repr('CPointer') {
+    sub _deref(PointerThing $x) returns int is native('06-struct') { * }
+    method deref() { return _deref(self); }
+}
+
+class PointerStruct is repr('CStruct') {
+    has PointerThing $.p;
+}
+
 sub ReturnAStruct() returns MyStruct2 is native('06-struct') { * }
 sub TakeAStruct(MyStruct $arg)        is native('06-struct') { * }
 
 sub ReturnAStructStruct() returns StructStruct is native('06-struct') { * }
 sub TakeAStructStruct(StructStruct $arg)       is native('06-struct') { * }
+
+sub ReturnAPointerStruct() returns PointerStruct is native('06-struct') { * }
 
 # Perl-side tests:
 my MyStruct $obj .= new;
@@ -93,6 +104,9 @@ is $ss.a.second, 11, 'field 2 from struct 1 in struct';
 
 is $ss.b.first,  3.7e0, 'field 1 from struct 1 in struct';
 is $ss.b.second, 0.1e0, 'field 2 from struct 1 in struct';
+
+my PointerStruct $x = ReturnAPointerStruct();
+is $x.p.deref, 19, 'CPointer object in struct';
 
 TakeAStruct($obj);
 
