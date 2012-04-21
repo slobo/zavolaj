@@ -122,10 +122,10 @@ my class OpaquePointer is export is repr('CPointer') { }
 
 # CArray class, used to represent C arrays.
 my class CArray is export is repr('CArray') {
-    method at_pos($pos) { die "CArray cannot be used without a type" }
+    method at_pos(CArray:D: $pos) { die "CArray cannot be used without a type" }
     
     my role IntTypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos(\$arr: $pos) is rw {
+        multi method at_pos(::?CLASS:D \$arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
                     nqp::p6box_i(nqp::r_atpos_i($arr, nqp::unbox_i($pos.Int)))
@@ -135,7 +135,7 @@ my class CArray is export is repr('CArray') {
                     self
                 }
         }
-        multi method at_pos(\$arr: int $pos) is rw {
+        multi method at_pos(::?CLASS:D \$arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
                     nqp::p6box_i(nqp::r_atpos_i($arr, $pos))
@@ -151,7 +151,7 @@ my class CArray is export is repr('CArray') {
     }
     
     my role NumTypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos(\$arr: $pos) is rw {
+        multi method at_pos(::?CLASS:D \$arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
                     nqp::p6box_n(nqp::r_atpos_n($arr, nqp::unbox_i($pos.Int)))
@@ -161,7 +161,7 @@ my class CArray is export is repr('CArray') {
                     self
                 }
         }
-        multi method at_pos(\$arr: int $pos) is rw {
+        multi method at_pos(::?CLASS:D \$arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
                     nqp::p6box_n(nqp::r_atpos_n($arr, $pos))
@@ -177,7 +177,7 @@ my class CArray is export is repr('CArray') {
     }
     
     my role TypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos(\$arr: $pos) is rw {
+        multi method at_pos(::?CLASS:D \$arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
                     nqp::r_atpos($arr, nqp::unbox_i($pos.Int))
@@ -187,7 +187,7 @@ my class CArray is export is repr('CArray') {
                     self
                 }
         }
-        multi method at_pos(\$arr: int $pos) is rw {
+        multi method at_pos(::?CLASS:D \$arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
                     nqp::r_atpos($arr, $pos)
