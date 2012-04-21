@@ -156,11 +156,6 @@ segfault or cause memory corruption. This isn't a shortcoming of Zavolaj, it's
 the way the big bad native world works. Scared? Here, have a hug. Good luck! :-)
 
 ## Structs
-Zavolaj also has some basic support for structs. It is constrained to only
-working with machine-size integers, doubles and strings at the moment; structs
-containing sized numeric types, pointers, arrays and pointers to other structs
-are in development.
-
 Thanks to representation polymorphism, it's possible to declare a normal looking
 Perl 6 class that, under the hood, stores its attributes in the same way a C
 compiler would lay them out in a similar struct definition. All it takes is a
@@ -172,7 +167,9 @@ quick use of the "repr" trait:
     }
 
 The attributes can only be of the types that Zavolaj knows how to marshall into
-struct fields. Other than that, you can do the usual set of things you would with
+struct fields. Currently, structs can contain machine-sized integers, doubles,
+strings, and otherr Zavolaj objects (CArrays, and those using the CPointer and
+CStruct reprs). Other than that, you can do the usual set of things you would with
 a class; you could even have some of the attributes come from roles or have them
 inherited from another class. Of course, methods are completely fine too. Go wild!
 
@@ -181,6 +178,10 @@ struct is never resized. When you create a struct, the memory is managed for you
 when the variable(s) pointing to the instance of a CStruct go away, the memory will
 be freed when GC gets to it. When a CStruct-based type is used for the return type,
 the memory is not managed for you.
+
+Zavolaj currently doesn't put object members in containers, so assigning new values
+to them (with =) doesn't work. Instead, you have to bind new values to the private
+members: $!struct-member := StructObj.new;
 
 As you may have predicted by now, a null is represented by the type object of the
 struct type.
