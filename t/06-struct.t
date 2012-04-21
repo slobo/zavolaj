@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 12;
+plan 20;
 
 compile_test_lib('06-struct');
 
