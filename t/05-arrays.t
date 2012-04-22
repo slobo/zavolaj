@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 8;
+plan 14;
 
 compile_test_lib('05-arrays');
 
@@ -38,3 +38,31 @@ compile_test_lib('05-arrays');
     @arr[0] = 1;
     is @arr[0], 1, 'getting last element of managed array';
 }
+
+{
+    class Struct is repr('CStruct') {
+        has int $.val;
+
+        method set($x) {
+            $!val = $x;
+        }
+    }
+
+    sub ReturnAStructArray() returns CArray[Struct] is native("05-arrays") { * }
+    my @arr := ReturnAStructArray();
+    is @arr[0].val, 2, 'int in struct in element 0';
+    is @arr[1].val, 3, 'int in struct in element 1';
+    is @arr[2].val, 5, 'int in struct in element 2';
+
+    sub TakeAStructArray(CArray[Struct] $obj) is native("05-arrays") { * }
+    @arr := CArray[Struct].new;
+    @arr[0] = Struct.new();
+    @arr[1] = Struct.new();
+    @arr[2] = Struct.new();
+    @arr[0].set(7);
+    @arr[1].set(11);
+    @arr[2].set(13);
+    TakeAStructArray(@arr);
+}
+
+# vim:ft=perl6
