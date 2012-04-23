@@ -54,9 +54,9 @@ DLLEXPORT Struct **ReturnAStructArray() {
 
 DLLEXPORT void TakeAStructArray(Struct **structs) {
     if(structs[0]->value != 7) printf("not ");
-    printf("ok 13 - struct in position 0, C-side\n");
+    printf("ok - struct in position 0, C-side\n");
     if(structs[1]->value != 11) printf("not ");
-    printf("ok 14 - struct in position 1, C-side\n");
+    printf("ok - struct in position 1, C-side\n");
     if(structs[2]->value != 13) printf("not ");
-    printf("ok 15 - struct in position 2, C-side\n");
+    printf("ok - struct in position 2, C-side\n");
 }
