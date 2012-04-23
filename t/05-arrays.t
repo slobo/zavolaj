@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 14;
+plan 15;
 
 compile_test_lib('05-arrays');
 
@@ -65,6 +65,7 @@ compile_test_lib('05-arrays');
 
     is_deeply @arr[100], Struct, 'out-of-bounds access on managed array';
 
+    # runs tests no 13, 14, 15
     TakeAStructArray(@arr);
 }
 
