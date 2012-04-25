@@ -2,7 +2,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 15;
+plan 16;
 
 compile_test_lib('05-arrays');
 
@@ -37,6 +37,13 @@ compile_test_lib('05-arrays');
     my @arr := CArray[int].new();
     @arr[0] = 1;
     is @arr[0], 1, 'getting last element of managed array';
+}
+
+{
+    my @arr := CArray[OpaquePointer].new;
+    @arr[1] = OpaquePointer;
+    my $x = @arr[0];
+    pass 'getting uninitialized element in managed array';
 }
 
 {
