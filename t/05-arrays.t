@@ -7,7 +7,7 @@ plan 16;
 compile_test_lib('05-arrays');
 
 {
-    sub ReturnADoubleArray() returns CArray[num] is native("05-arrays") { * }
+    sub ReturnADoubleArray() returns CArray[num] is native("./05-arrays") { * }
     my @rarr := ReturnADoubleArray();
     is_approx @rarr[0], 23.45e0, 'returning double array (1)';
     is_approx @rarr[1], -99.87e0, 'returning double array (2)';
@@ -21,7 +21,7 @@ compile_test_lib('05-arrays');
 }
 
 {
-    sub ReturnAStringArray() returns CArray[Str] is native("05-arrays") { * }
+    sub ReturnAStringArray() returns CArray[Str] is native("./05-arrays") { * }
     my @rarr := ReturnAStringArray();
     is @rarr[0], 'La Trappe', 'returning string array (1)';
     is @rarr[1], 'Leffe', 'returning string array (2)';
