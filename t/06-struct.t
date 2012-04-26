@@ -65,7 +65,7 @@ class StructStruct is repr('CStruct') {
 }
 
 class PointerThing is repr('CPointer') {
-    sub _deref(PointerThing $x) returns int is native('06-struct') { * }
+    sub _deref(PointerThing $x) returns int is native('./06-struct') { * }
     method deref() { return _deref(self); }
 }
 
@@ -73,13 +73,13 @@ class PointerStruct is repr('CStruct') {
     has PointerThing $.p;
 }
 
-sub ReturnAStruct() returns MyStruct2 is native('06-struct') { * }
-sub TakeAStruct(MyStruct $arg)        is native('06-struct') { * }
+sub ReturnAStruct() returns MyStruct2 is native('./06-struct') { * }
+sub TakeAStruct(MyStruct $arg)        is native('./06-struct') { * }
 
-sub ReturnAStructStruct() returns StructStruct is native('06-struct') { * }
-sub TakeAStructStruct(StructStruct $arg)       is native('06-struct') { * }
+sub ReturnAStructStruct() returns StructStruct is native('./06-struct') { * }
+sub TakeAStructStruct(StructStruct $arg)       is native('./06-struct') { * }
 
-sub ReturnAPointerStruct() returns PointerStruct is native('06-struct') { * }
+sub ReturnAPointerStruct() returns PointerStruct is native('./06-struct') { * }
 
 # Perl-side tests:
 my MyStruct $obj .= new;

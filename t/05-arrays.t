@@ -13,7 +13,7 @@ compile_test_lib('05-arrays');
     is_approx @rarr[1], -99.87e0, 'returning double array (2)';
     is_approx @rarr[2], 0.25e0, 'returning double array (3)';
 
-    sub TakeADoubleArrayAndAddElements(CArray[num]) returns num is native("05-arrays") { * }
+    sub TakeADoubleArrayAndAddElements(CArray[num]) returns num is native("./05-arrays") { * }
     my @parr := CArray[num].new();
     @parr[0] = 9.5e0;
     @parr[1] = 32.5e0;
@@ -26,7 +26,7 @@ compile_test_lib('05-arrays');
     is @rarr[0], 'La Trappe', 'returning string array (1)';
     is @rarr[1], 'Leffe', 'returning string array (2)';
     
-    sub TakeAStringArrayAndReturnTotalLength(CArray[Str]) returns int32 is native("05-arrays") { * }
+    sub TakeAStringArrayAndReturnTotalLength(CArray[Str]) returns int32 is native("./05-arrays") { * }
     my @parr := CArray[Str].new();
     @parr[0] = "OMG";
     @parr[1] = "strings!!!";
@@ -55,13 +55,13 @@ compile_test_lib('05-arrays');
         }
     }
 
-    sub ReturnAStructArray() returns CArray[Struct] is native("05-arrays") { * }
+    sub ReturnAStructArray() returns CArray[Struct] is native("./05-arrays") { * }
     my @arr := ReturnAStructArray();
     is @arr[0].val, 2, 'int in struct in element 0';
     is @arr[1].val, 3, 'int in struct in element 1';
     is @arr[2].val, 5, 'int in struct in element 2';
 
-    sub TakeAStructArray(CArray[Struct] $obj) is native("05-arrays") { * }
+    sub TakeAStructArray(CArray[Struct] $obj) is native("./05-arrays") { * }
     @arr := CArray[Struct].new;
     @arr[0] = Struct.new();
     @arr[1] = Struct.new();
