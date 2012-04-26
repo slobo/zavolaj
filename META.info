@@ -4,5 +4,5 @@
     "description" : "Call native libraries",
     "depends" : [ ],
     "repo-type" : "git",
-    "repo-url" : "git://github.com/jnthn/zavolaj.git"
+    "source-url" : "git://github.com/jnthn/zavolaj.git"
 }
