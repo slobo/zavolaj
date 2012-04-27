@@ -87,7 +87,8 @@ my role Native[Routine $r, Str $libname] {
         unless $!setup {
             my Mu $arg_info := nqp::list();
             for $r.signature.params -> $p {
-                nqp::push($arg_info, param_hash_for($p))
+                nqp::push($arg_info, param_hash_for($p));
+                nqp::bindattr(nqp::p6decont($p), Parameter, '$!nominal_type', nqp::p6decont(map_return_type($p.type)));
             }
             my str $conv = self.?native_call_convention || '';
             my $realname = 
