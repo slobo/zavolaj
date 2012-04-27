@@ -102,6 +102,9 @@ my role Native[Routine $r, Str $libname] {
                 return_hash_for($r));
             $!setup = 1;
         }
+        unless $r.candidates_matching(|$args) {
+            die "Signature mismatch while calling native function {$r.name}";
+        }
         nqp::nativecall(nqp::p6decont(map_return_type($r.returns)), self,
             nqp::getattr(nqp::p6decont($args), Capture, '$!list'))
     }
