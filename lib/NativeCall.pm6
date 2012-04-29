@@ -81,6 +81,7 @@ multi sub map_return_type($type) {
 # native call.
 my role Native[Routine $r, Str $libname] {
     has int $!setup;
+    has int $!param-count;
     has native_callsite $!call is box_target;
     
     method postcircumfix:<( )>($args) {
@@ -89,6 +90,7 @@ my role Native[Routine $r, Str $libname] {
             for $r.signature.params -> $p {
                 nqp::push($arg_info, param_hash_for($p))
             }
+            $!param-count = nqp::unbox_i($r.signature.params.elems);
             my str $conv = self.?native_call_convention || '';
             my $realname = 
                 !$libname.DEFINITE   ?? "" !!
@@ -102,6 +104,7 @@ my role Native[Routine $r, Str $libname] {
                 return_hash_for($r));
             $!setup = 1;
         }
+        die "Wrong number of arguments in call to native routine $r.name(). Got: $args.elems(), expected: $!param-count" if nqp::unbox_i($args.elems) != $!param-count;
         nqp::nativecall(nqp::p6decont(map_return_type($r.returns)), self,
             nqp::getattr(nqp::p6decont($args), Capture, '$!list'))
     }
