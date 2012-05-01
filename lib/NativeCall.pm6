@@ -229,3 +229,5 @@ multi trait_mod:<is>(Parameter $p, $name, :$encoded!) is export {
 multi trait_mod:<is>(Routine $p, $name, :$encoded!) is export {
     $p does NativeCallEncoded[$name];
 }
+
+# vim:ft=perl6
