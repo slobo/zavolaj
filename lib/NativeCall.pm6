@@ -4,11 +4,6 @@ module NativeCall;
 # representation.
 my class native_callsite is repr('NativeCall') { }
 
-class CStr is export is repr('CStr') { }
-role ExplicitlyManagedString {
-    has CStr $.cstr is rw;
-}
-
 # Maps a chosen string encoding to a type recognized by the native call engine.
 sub string_encoding_to_nci_type($enc) {
     given $enc {
@@ -235,12 +230,24 @@ multi trait_mod:<is>(Routine $p, $name, :$encoded!) is export {
     $p does NativeCallEncoded[$name];
 }
 
-# TODO: Encodings
-multi explicitly-manage(Str $s) is export {
-    $s does ExplicitlyManagedString;
-    # repr_box_str
-    #$s.cstr = nqp::unbox_s($s);
-    $s.cstr = pir::repr_box_str__PsP(nqp::unbox_s($s), CStr);
+class CStr is repr('CStr') {
+    my role Encoding[$encoding] {
+        method encoding() { $encoding }
+    }
+
+    multi method PARAMETERIZE_TYPE(Str:D $encoding) {
+        die "Unknown string encoding for native call: $encoding" if not $encoding eq any('utf8', 'utf16', 'ascii');
+        self but Encoding[$encoding];
+    }
+}
+
+role ExplicitlyManagedString {
+    has CStr $.cstr is rw;
+}
+
+multi explicitly-manage(Str $x, :$encoding = 'utf8') is export {
+    $x does ExplicitlyManagedString;
+    $x.cstr = pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]);
 }
 
 # vim:ft=perl6
