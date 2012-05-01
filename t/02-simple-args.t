@@ -1,7 +1,7 @@
 use t::CompileTestLib;
 use NativeCall;
 
-say "1..9";
+say "1..10";
 
 compile_test_lib('02-simple-args');
 
@@ -22,3 +22,13 @@ TakeAFloat(4.2e0);
 # String related
 sub TakeAString(Str) is native('./02-simple-args') { * }
 TakeAString('ok 9 - passed a string');
+
+# Explicitly managing strings
+sub SetString(Str) is native('./02-simple-args') { * }
+sub PrintString() is native('./02-simple-args') { * }
+my $str = 'ok 10 - delayed string print';
+explicitly-manage($str);
+SetString($str);
+PrintString();
+
+# vim:ft=perl6

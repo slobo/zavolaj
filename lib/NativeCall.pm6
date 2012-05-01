@@ -4,6 +4,11 @@ module NativeCall;
 # representation.
 my class native_callsite is repr('NativeCall') { }
 
+class CStr is export is repr('CStr') { }
+role ExplicitlyManagedString {
+    has CStr $.cstr is rw;
+}
+
 # Maps a chosen string encoding to a type recognized by the native call engine.
 sub string_encoding_to_nci_type($enc) {
     given $enc {
@@ -228,6 +233,14 @@ multi trait_mod:<is>(Parameter $p, $name, :$encoded!) is export {
 }
 multi trait_mod:<is>(Routine $p, $name, :$encoded!) is export {
     $p does NativeCallEncoded[$name];
+}
+
+# TODO: Encodings
+multi explicitly-manage(Str $s) is export {
+    $s does ExplicitlyManagedString;
+    # repr_box_str
+    #$s.cstr = nqp::unbox_s($s);
+    $s.cstr = pir::repr_box_str__PsP(nqp::unbox_s($s), CStr);
 }
 
 # vim:ft=perl6
