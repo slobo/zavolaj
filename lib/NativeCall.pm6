@@ -245,7 +245,7 @@ role ExplicitlyManagedString {
     has CStr $.cstr is rw;
 }
 
-multi explicitly-manage(Str $x, :$encoding = 'utf8') is export {
+multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export {
     $x does ExplicitlyManagedString;
     $x.cstr = pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]);
 }
