@@ -197,6 +197,9 @@ send in a patch. ;-)
 
 The examples directory contains various examples of how to use Zavolaj.
 
+More examples can be found in the lib/DBDish/ directory of the DBIsh repository
+at https://github.com/perl6/DBIish/.
+
 ### MySQL
 
 There is an exmaple of using the MySQL client library. There is a Rakudo project
@@ -227,10 +230,6 @@ You can look at the results via a normal mysql connection:
     USE zavolaj;
     SHOW TABLES;
     SELECT * FROM nom;
-
-### SQLite3
-
-May not be working...let us know if you get success!
 
 ### Microsoft Windows
 
