@@ -168,7 +168,7 @@ quick use of the "repr" trait:
 
 The attributes can only be of the types that Zavolaj knows how to marshall into
 struct fields. Currently, structs can contain machine-sized integers, doubles,
-strings, and otherr Zavolaj objects (CArrays, and those using the CPointer and
+strings, and other Zavolaj objects (CArrays, and those using the CPointer and
 CStruct reprs). Other than that, you can do the usual set of things you would with
 a class; you could even have some of the attributes come from roles or have them
 inherited from another class. Of course, methods are completely fine too. Go wild!
