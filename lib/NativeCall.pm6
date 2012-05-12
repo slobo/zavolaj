@@ -212,16 +212,16 @@ multi trait_mod:<is>(Routine $r, :$native!) is export {
 }
 
 # Specifies the calling convention to use for a native call.
-multi trait_mod:<is>(Routine $r, $name, :$nativeconv!) is export {
-    $r does NativeCallingConvention[$name];
+multi trait_mod:<is>(Routine $r, :$nativeconv!) is export {
+    $r does NativeCallingConvention[$nativeconv];
 }
 
 # Ways to specify how to marshall strings.
-multi trait_mod:<is>(Parameter $p, $name, :$encoded!) is export {
-    $p does NativeCallEncoded[$name];
+multi trait_mod:<is>(Parameter $p, :$encoded!) is export {
+    $p does NativeCallEncoded[$encoded];
 }
-multi trait_mod:<is>(Routine $p, $name, :$encoded!) is export {
-    $p does NativeCallEncoded[$name];
+multi trait_mod:<is>(Routine $p, :$encoded!) is export {
+    $p does NativeCallEncoded[$encoded];
 }
 
 class CStr is repr('CStr') {
