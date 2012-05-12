@@ -1,3 +1,4 @@
+use lib '.';
 use t::CompileTestLib;
 use NativeCall;
 

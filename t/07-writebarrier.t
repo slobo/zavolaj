@@ -1,3 +1,4 @@
+use lib '.';
 use t::CompileTestLib;
 use NativeCall;
 use Test;
@@ -7,7 +8,7 @@ plan 6;
 compile_test_lib('07-writebarrier');
 
 class IntPtr is repr('CPointer') {
-    sub _deref(IntPtr $x) returns int is native('07-writebarrier') { * }
+    sub _deref(IntPtr $x) returns int is native('./07-writebarrier') { * }
     method deref() { return _deref(self); }
 }
 
@@ -19,10 +20,10 @@ class Structy is repr('CStruct') {
     }
 }
 
-sub make_ptr() returns IntPtr  is native('07-writebarrier') { * }
-sub array_twiddle(CArray[IntPtr] $a) is native('07-writebarrier') { * }
-sub struct_twiddle(Structy $s) is native('07-writebarrier') { * }
-sub dummy(CArray[OpaquePointer] $a) is native('07-writebarrier') { * }
+sub make_ptr() returns IntPtr  is native('./07-writebarrier') { * }
+sub array_twiddle(CArray[IntPtr] $a) is native('./07-writebarrier') { * }
+sub struct_twiddle(Structy $s) is native('./07-writebarrier') { * }
+sub dummy(CArray[OpaquePointer] $a) is native('./07-writebarrier') { * }
 
 my Structy $s .= new;
 $s.set(make_ptr);
