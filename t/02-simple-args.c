@@ -66,4 +66,11 @@ DLLEXPORT void TakeAString(char *pass_msg)
     printf("%s\n", pass_msg);
 }
 
+static char *cached_str = NULL;
+DLLEXPORT void SetString(char *str) {
+    cached_str = str;
+}
 
+DLLEXPORT void PrintString() {
+    printf("%s\n", cached_str);
+}
