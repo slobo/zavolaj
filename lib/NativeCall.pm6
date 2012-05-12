@@ -205,16 +205,10 @@ my class CArray is export is repr('CArray') {
     }
 }
 
-# Specifies that the routine is actually a native call, and gives
-# the name of the library to load it from.
-multi trait_mod:<is>(Routine $r, $libname, :$native!) is export {
-    $r does Native[$r, $libname];
-}
-
 # Specifies that the routine is actually a native call, into the
-# current executable (platform specific).
+# current executable (platform specific) or into a named library
 multi trait_mod:<is>(Routine $r, :$native!) is export {
-    $r does Native[$r, Str];
+    $r does Native[$r, $native === True ?? Str !! $native];
 }
 
 # Specifies the calling convention to use for a native call.
