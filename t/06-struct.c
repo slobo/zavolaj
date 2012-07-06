@@ -25,6 +25,11 @@ typedef struct {
     long *p;
 } PointerStruct;
 
+typedef struct {
+    char *first;
+    char *second;
+} StringStruct;
+
 DLLEXPORT MyStruct *ReturnAStruct()
 {
     MyStruct *obj = (MyStruct *) malloc(sizeof(MyStruct));
@@ -79,6 +84,21 @@ DLLEXPORT PointerStruct *ReturnAPointerStruct() {
     *(obj->p) = 19;
 
     return obj;
+}
+
+DLLEXPORT StringStruct *ReturnAStringStruct() {
+    StringStruct *obj = (StringStruct *) malloc(sizeof(StringStruct));
+    obj->first = "OMG!";
+    obj->second = "Strings!";
+
+    return obj;
+}
+
+DLLEXPORT void TakeAStringStruct(StringStruct *obj) {
+    if(strcmp(obj->first, "Lorem")) printf("not ");
+    printf("ok - C-value of first string in struct\n");
+    if(strcmp(obj->second, "ipsum")) printf("not ");
+    printf("ok - C-value of second string in struct\n");
 }
 
 DLLEXPORT long _deref(long *ptr) {

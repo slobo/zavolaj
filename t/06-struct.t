@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 21;
+plan 25;
 
 compile_test_lib('06-struct');
 
@@ -65,6 +65,16 @@ class StructStruct is repr('CStruct') {
     }
 }
 
+class StringStruct is repr('CStruct') {
+    has Str $.first;
+    has Str $.second;
+
+    method init {
+        $!first  := 'Lorem';
+        $!second := 'ipsum';
+    }
+}
+
 class PointerThing is repr('CPointer') {
     sub _deref(PointerThing $x) returns int is native('./06-struct') { * }
     method deref() { return _deref(self); }
@@ -81,6 +91,9 @@ sub ReturnAStructStruct() returns StructStruct is native('./06-struct') { * }
 sub TakeAStructStruct(StructStruct $arg)       is native('./06-struct') { * }
 
 sub ReturnAPointerStruct() returns PointerStruct is native('./06-struct') { * }
+
+sub ReturnAStringStruct() returns StringStruct is native('./06-struct') { * }
+sub TakeAStringStruct(StringStruct $arg)       is native('./06-struct') { * }
 
 # Perl-side tests:
 my MyStruct $obj .= new;
@@ -109,11 +122,21 @@ is $ss.b.second, 0.1e0, 'field 2 from struct 1 in struct';
 my PointerStruct $x = ReturnAPointerStruct();
 is $x.p.deref, 19, 'CPointer object in struct';
 
+my StringStruct $strstr = ReturnAStringStruct();
+is $strstr.first,  'OMG!',     'first string in struct';
+is $strstr.second, 'Strings!', 'second string in struct';
+
 TakeAStruct($obj);
 
 my StructStruct $ss2 .= new();
 $ss2.init;
 
 TakeAStructStruct($ss2);
+
+my StringStruct $strstr2 .= new();
+$strstr2.init;
+#$strstr2.first  := "Lorem";
+#$strstr2.second := "ipsum";
+TakeAStringStruct($strstr2);
 
 # vim:ft=perl6
