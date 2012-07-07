@@ -1,8 +1,5 @@
 Here's some of the things that remaing to be done
 * Awesome Documentation
-* Support strings in structs
 * Properly support sized types in structs
 * Properly support sized types in arrays
-* Support pointers in structs
-* Support arrays of structs and pointers
 * Support callbacks
