@@ -15,18 +15,35 @@ sub string_encoding_to_nci_type($enc) {
 }
 
 # Builds a hash of type information for the specified parameter.
-sub param_hash_for(Parameter $p) {
+sub param_hash_for(Parameter $p, :$with-typeobj) {
     my Mu $result := nqp::hash();
     my $type := $p.type();
+    nqp::bindkey($result, 'typeobj', $type) if $with-typeobj;
     if $type ~~ Str {
         my $enc := $p.?native_call_encoded() || 'utf8';
         nqp::bindkey($result, 'type', nqp::unbox_s(string_encoding_to_nci_type($enc)));
         nqp::bindkey($result, 'free_str', nqp::unbox_i(1));
     }
+    elsif $type ~~ Callable {
+        nqp::bindkey($result, 'type', nqp::unbox_s(type_code_for($p.type)));
+        my $info := param_list_for($p.signature, :with-typeobj);
+        nqp::unshift($info, return_hash_for($type));
+        nqp::bindkey($result, 'callback_args', $info);
+    }
     else {
         nqp::bindkey($result, 'type', nqp::unbox_s(type_code_for($p.type)));
     }
     $result
+}
+
+# Builds the list of parameter information for a callback argument.
+sub param_list_for(Signature $sig, :$with-typeobj) {
+    my Mu $arg_info := nqp::list();
+    for $sig.params -> $p {
+        nqp::push($arg_info, param_hash_for($p, :with-typeobj($with-typeobj)))
+    }
+
+    return $arg_info;
 }
 
 # Builds a hash of type information for the specified return type.
@@ -38,6 +55,8 @@ sub return_hash_for(&r) {
         nqp::bindkey($result, 'type', nqp::unbox_s(string_encoding_to_nci_type($enc)));
         nqp::bindkey($result, 'free_str', nqp::unbox_i(0));
     }
+    # TODO: If we ever want to handle function pointers returned from C, this
+    # bit of code needs to handle that.
     else {
         nqp::bindkey($result, 'type',
             $returns =:= Mu ?? 'void' !! nqp::unbox_s(type_code_for($returns)));
@@ -47,15 +66,16 @@ sub return_hash_for(&r) {
 
 # Gets the NCI type code to use based on a given Perl 6 type.
 my %type_map =
-    'int8'  => 'char',
-    'int16' => 'short',
-    'int32' => 'int',
-    'int'   => 'long',
-    'Int'   => 'longlong',
-    'num32' => 'float',
-    'num64' => 'double',
-    'num'   => 'double',
-    'Num'   => 'double';
+    'int8'     => 'char',
+    'int16'    => 'short',
+    'int32'    => 'int',
+    'int'      => 'long',
+    'Int'      => 'longlong',
+    'num32'    => 'float',
+    'num64'    => 'double',
+    'num'      => 'double',
+    'Num'      => 'double',
+    'Callable' => 'callback';
 sub type_code_for(Mu ::T) {
     return %type_map{T.^name}
         if %type_map.exists(T.^name);
@@ -85,10 +105,7 @@ my role Native[Routine $r, Str $libname] {
     
     method postcircumfix:<( )>($args) {
         unless $!setup {
-            my Mu $arg_info := nqp::list();
-            for $r.signature.params -> $p {
-                nqp::push($arg_info, param_hash_for($p))
-            }
+            my Mu $arg_info := param_list_for($r.signature);
             my str $conv = self.?native_call_convention || '';
             my $realname = 
                 !$libname.DEFINITE   ?? "" !!
