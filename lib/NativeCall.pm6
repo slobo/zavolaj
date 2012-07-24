@@ -26,7 +26,7 @@ sub param_hash_for(Parameter $p, :$with-typeobj) {
     }
     elsif $type ~~ Callable {
         nqp::bindkey($result, 'type', nqp::unbox_s(type_code_for($p.type)));
-        my $info := param_list_for($p.signature, :with-typeobj);
+        my $info := param_list_for($p.sub_signature, :with-typeobj);
         nqp::unshift($info, return_hash_for($type));
         nqp::bindkey($result, 'callback_args', $info);
     }
