@@ -43,7 +43,7 @@ sub param_list_for(Signature $sig, :$with-typeobj) {
         nqp::push($arg_info, param_hash_for($p, :with-typeobj($with-typeobj)))
     }
 
-    return $arg_info;
+    $arg_info;
 }
 
 # Builds a hash of type information for the specified return type.
