@@ -27,7 +27,7 @@ sub param_hash_for(Parameter $p, :$with-typeobj) {
     elsif $type ~~ Callable {
         nqp::bindkey($result, 'type', nqp::unbox_s(type_code_for($p.type)));
         my $info := param_list_for($p.sub_signature, :with-typeobj);
-        nqp::unshift($info, return_hash_for($type));
+        nqp::unshift($info, return_hash_for($p.sub_signature));
         nqp::bindkey($result, 'callback_args', $info);
     }
     else {
@@ -47,9 +47,9 @@ sub param_list_for(Signature $sig, :$with-typeobj) {
 }
 
 # Builds a hash of type information for the specified return type.
-sub return_hash_for(&r) {
+sub return_hash_for(Signature $s) {
     my Mu $result := nqp::hash();
-    my $returns := &r.returns;
+    my $returns := $s.returns;
     if $returns ~~ Str {
         my $enc := &r.?native_call_encoded() || 'utf8';
         nqp::bindkey($result, 'type', nqp::unbox_s(string_encoding_to_nci_type($enc)));
@@ -116,7 +116,7 @@ my role Native[Routine $r, Str $libname] {
                 nqp::unbox_s($r.name),      # symbol to call
                 nqp::unbox_s($conv),        # calling convention
                 $arg_info,
-                return_hash_for($r));
+                return_hash_for($r.signature));
             $!setup = 1;
         }
         nqp::nativecall(nqp::p6decont(map_return_type($r.returns)), self,
