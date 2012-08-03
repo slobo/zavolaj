@@ -261,4 +261,9 @@ multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export {
     $x.cstr = pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]);
 }
 
+multi refresh($obj) is export {
+    nqp::nativecallrefresh($obj);
+    1;
+}
+
 # vim:ft=perl6

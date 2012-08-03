@@ -4,6 +4,8 @@ typedef struct {
     long *ptr;
 } Structy;
 
+static Structy *saved = NULL;
+
 long _deref(long *ptr) {
     return *ptr;
 }
@@ -31,4 +33,13 @@ void array_twiddle(long **arr) {
 
 void dummy(void **arr) {
     /* dummy */
+}
+
+void save_ref(Structy *s) {
+    saved = s;
+}
+
+void atadistance(void) {
+    saved->ptr = (long *) malloc(sizeof(long));
+    *(saved->ptr) = 42;
 }

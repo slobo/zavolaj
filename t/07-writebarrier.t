@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 6;
+plan 8;
 
 compile_test_lib('07-writebarrier');
 
@@ -24,6 +24,8 @@ sub make_ptr() returns IntPtr  is native('./07-writebarrier') { * }
 sub array_twiddle(CArray[IntPtr] $a) is native('./07-writebarrier') { * }
 sub struct_twiddle(Structy $s) is native('./07-writebarrier') { * }
 sub dummy(CArray[OpaquePointer] $a) is native('./07-writebarrier') { * }
+sub save_ref(Structy $s) is native('./07-writebarrier') { * }
+sub atadistance() is native('./07-writebarrier') { * }
 
 my Structy $s .= new;
 $s.set(make_ptr);
@@ -42,6 +44,12 @@ is @arr[1].deref, 2, 'array element 2 after twiddle';
 is @arr[2].deref, 3, 'array element 3 after twiddle';
 
 dummy(CArray);
-pass 'ignore NULL arguments'
+pass 'ignore NULL arguments';
+
+save_ref($s);
+atadistance();
+isnt($s.ptr.deref, 42, 'struct value before refresh');
+refresh($s);
+is($s.ptr.deref, 42, 'struct value before refresh');
 
 # vim:ft=perl6
