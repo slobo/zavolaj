@@ -39,16 +39,16 @@ used in the library you're loading.  Maybe the name is long or has different cas
 or is otherwise cumbersome within the context of the module you are trying to
 create.
 
-Zavolaj provides a "named" trait for you to specify the name of the native 
+Zavolaj provides a "symbol" trait for you to specify the name of the native
 routine in your library that may be different from your Perl subroutine name.
 
     module Foo;
     use NativeCall;
-    our sub Init() is native('libfoo') is named('FOO_INIT') { * }
+    our sub Init() is native('libfoo') is symbol('FOO_INIT') { * }
 
 Inside of "libfoo" there is a routine called "FOO\_INIT" but, since we're
 creating a module called Foo and we'd rather call the routine as Foo::Init, 
-we use the "named" trait to specify the name of the symbol in "libfoo" 
+we use the "symbol" trait to specify the name of the symbol in "libfoo" 
 and call the subroutine whatever we want ("Init" in this case).
 
 ## Passing and Returning Values

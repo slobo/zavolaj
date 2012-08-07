@@ -97,8 +97,8 @@ multi sub map_return_type($type) {
                                                                              $type
 }
 
-my role Named[Str $name] {
-    method native_name()  { $name }
+my role NativeCallSymbol[Str $name] {
+    method native_symbol()  { $name }
 }
 
 # This role is mixed in to any routine that is marked as being a
@@ -117,7 +117,7 @@ my role Native[Routine $r, Str $libname] {
                                         "$libname$*VM<config><load_ext>";
             nqp::buildnativecall(self,
                 nqp::unbox_s($realname),    # library name
-                nqp::unbox_s(self.?native_name || $r.name),      # symbol to call
+                nqp::unbox_s(self.?native_symbol // $r.name),      # symbol to call
                 nqp::unbox_s($conv),        # calling convention
                 $arg_info,
                 return_hash_for($r.signature));
@@ -226,8 +226,8 @@ my class CArray is export is repr('CArray') {
     }
 }
 
-multi trait_mod:<is>(Routine $r, :$named!) is export {
-    $r does Named[$named];
+multi trait_mod:<is>(Routine $r, :$symbol!) is export {
+    $r does NativeCallSymbol[$symbol];
 }
 
 # Specifies that the routine is actually a native call, into the
