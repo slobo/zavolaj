@@ -33,6 +33,24 @@ that you can do is just adding to this simple pattern of declaring a Perl 6
 sub, naming it after the symbol you want to call and marking it with the "native"
 trait.
 
+## Changing names
+Sometimes you want the name of your Perl subroutine to be different from the name
+used in the library you're loading.  Maybe the name is long or has different casing
+or is otherwise cumbersome within the context of the module you are trying to
+create.
+
+Zavolaj provides a "named" trait for you to specify the name of the native 
+routine in your library that may be different from your Perl subroutine name.
+
+    module Foo;
+    use NativeCall;
+    our sub Init() is native('libfoo') is named('FOO_INIT') { * }
+
+Inside of "libfoo" there is a routine called "FOO\_INIT" but, since we're
+creating a module called Foo and we'd rather call the routine as Foo::Init, 
+we use the "named" trait to specify the name of the symbol in "libfoo" 
+and call the subroutine whatever we want ("Init" in this case).
+
 ## Passing and Returning Values
 Normal Perl 6 signatures and the "returns" trait are used in order to convey
 the type of arguments a native function expects and what it returns. Here is
