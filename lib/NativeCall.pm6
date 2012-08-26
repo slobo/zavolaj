@@ -139,10 +139,10 @@ my role NativeCallEncoded[$name] {
 }
 
 # Expose an OpaquePointer class for working with raw pointers.
-my class OpaquePointer is export is repr('CPointer') { }
+my class OpaquePointer is export(:types, :DEFAULT) is repr('CPointer') { }
 
 # CArray class, used to represent C arrays.
-my class CArray is export is repr('CArray') {
+my class CArray is export(:types, :DEFAULT) is repr('CArray') {
     method at_pos(CArray:D: $pos) { die "CArray cannot be used without a type" }
     
     my role IntTypedCArray[::TValue] does Positional[TValue] {
@@ -226,26 +226,26 @@ my class CArray is export is repr('CArray') {
     }
 }
 
-multi trait_mod:<is>(Routine $r, :$symbol!) is export {
+multi trait_mod:<is>(Routine $r, :$symbol!) is export(:DEFAULT, :traits) {
     $r does NativeCallSymbol[$symbol];
 }
 
 # Specifies that the routine is actually a native call, into the
 # current executable (platform specific) or into a named library
-multi trait_mod:<is>(Routine $r, :$native!) is export {
+multi trait_mod:<is>(Routine $r, :$native!) is export(:DEFAULT, :traits) {
     $r does Native[$r, $native === True ?? Str !! $native];
 }
 
 # Specifies the calling convention to use for a native call.
-multi trait_mod:<is>(Routine $r, :$nativeconv!) is export {
+multi trait_mod:<is>(Routine $r, :$nativeconv!) is export(:DEFAULT, :traits) {
     $r does NativeCallingConvention[$nativeconv];
 }
 
 # Ways to specify how to marshall strings.
-multi trait_mod:<is>(Parameter $p, :$encoded!) is export {
+multi trait_mod:<is>(Parameter $p, :$encoded!) is export(:DEFAULT, :traits) {
     $p does NativeCallEncoded[$encoded];
 }
-multi trait_mod:<is>(Routine $p, :$encoded!) is export {
+multi trait_mod:<is>(Routine $p, :$encoded!) is export(:DEFAULT, :traits) {
     $p does NativeCallEncoded[$encoded];
 }
 
@@ -264,12 +264,13 @@ role ExplicitlyManagedString {
     has CStr $.cstr is rw;
 }
 
-multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export {
+multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export(:DEFAULT,
+:utils) {
     $x does ExplicitlyManagedString;
     $x.cstr = pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]);
 }
 
-multi refresh($obj) is export {
+multi refresh($obj) is export(:DEFAULT, :utils) {
     nqp::nativecallrefresh($obj);
     1;
 }
