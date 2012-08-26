@@ -2,7 +2,7 @@ use lib '.';
 use t::CompileTestLib;
 use NativeCall;
 
-say "1..10";
+say "1..11";
 
 compile_test_lib('02-simple-args');
 
@@ -31,5 +31,11 @@ my $str = 'ok 10 - delayed string print';
 explicitly-manage($str);
 SetString($str);
 PrintString();
+
+# Make sure wrapped subs work
+sub wrapped(int) is native('./02-simple-args') { * }
+sub wrapper(int $arg) { wrapped($arg) }
+
+wrapper(1);
 
 # vim:ft=perl6

@@ -74,3 +74,7 @@ DLLEXPORT void SetString(char *str) {
 DLLEXPORT void PrintString() {
     printf("%s\n", cached_str);
 }
+
+DLLEXPORT void wrapped(int n) {
+    printf("ok - wrapped sub\n");
+}
