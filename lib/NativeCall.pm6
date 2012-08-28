@@ -166,6 +166,14 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                     self
                 }
         }
+        method STORE(::?CLASS:D \$arr: *@ints) {
+            # TODO: empty $arr first
+            for @ints.kv -> $i, $v {
+                nqp::r_bindpos_i($arr, nqp::unbox_i($i),
+                        nqp::unbox_i($v.Int));
+            }
+            $arr;
+        }
     }
     multi method PARAMETERIZE_TYPE(Int:U $t) {
         self but IntTypedCArray[$t.WHAT]
@@ -191,6 +199,14 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                     nqp::r_bindpos_n($arr, $pos, $v);
                     self
                 }
+        }
+        method STORE(::?CLASS:D \$arr: *@nums) {
+            # TODO: empty $arr first
+            for @nums.kv -> $i, $v {
+                nqp::r_bindpos_n($arr, nqp::unbox_i($i),
+                        nqp::unbox_n($v.Num));
+            }
+            $arr;
         }
     }
     multi method PARAMETERIZE_TYPE(Num:U $t) {
@@ -223,6 +239,9 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
         die "A C array can only hold integers, numbers, strings, CStructs, CPointers or CArrays (not $t.perl())"
             unless $t === Str || $t.REPR eq 'CStruct' | 'CPointer' | 'CArray';
         self but TypedCArray[$t.WHAT]
+    }
+    method STORE(*@vals) {
+
     }
 }
 

@@ -16,8 +16,7 @@ compile_test_lib('05-arrays');
 
     sub TakeADoubleArrayAndAddElements(CArray[num]) returns num is native("./05-arrays") { * }
     my @parr := CArray[num].new();
-    @parr[0] = 9.5e0;
-    @parr[1] = 32.5e0;
+    @parr = 9.5e0, 32.5e0;
     is_approx TakeADoubleArrayAndAddElements(@parr), 42e0, 'passing double array';
 }
 
