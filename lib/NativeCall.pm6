@@ -167,7 +167,8 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                 }
         }
         method STORE(::?CLASS:D \$arr: *@ints) {
-            # TODO: empty $arr first
+            die "Can only use list assignment on sufficiently small CArrays"
+                if nqp::r_elems($arr) > @ints.elems;
             for @ints.kv -> $i, $v {
                 nqp::r_bindpos_i($arr, nqp::unbox_i($i),
                         nqp::unbox_i($v.Int));
@@ -201,7 +202,8 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                 }
         }
         method STORE(::?CLASS:D \$arr: *@nums) {
-            # TODO: empty $arr first
+            die "Can only use list assignment on sufficiently small CArrays"
+                if nqp::r_elems($arr) > @nums.elems;
             for @nums.kv -> $i, $v {
                 nqp::r_bindpos_n($arr, nqp::unbox_i($i),
                         nqp::unbox_n($v.Num));
@@ -235,6 +237,8 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                 }
         }
         method STORE(::?CLASS:D \$arr: *@vals) {
+            die "Can only use list assignment on sufficiently small CArrays"
+                if nqp::r_elems($arr) > @vals.elems;
             for @vals.kv -> $k, $v {
                 nqp::r_bindpos($arr, nqp::unbox_i($k), nqp::p6decont($v));
             }
