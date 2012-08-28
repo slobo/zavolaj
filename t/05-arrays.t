@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 16;
+plan 17;
 
 compile_test_lib('05-arrays');
 
@@ -73,6 +73,14 @@ compile_test_lib('05-arrays');
 
     # runs tests no 13, 14, 15
     TakeAStructArray(@arr);
+}
+
+{
+    my @a := CArray[Str].new;
+    @a = 'a' .. 'f';
+    dies_ok {
+        @a = 'oh', 'really?';
+    }, 'list assignment to CArray dies rather than not clipping the array';
 }
 
 # vim:ft=perl6
