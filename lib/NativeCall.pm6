@@ -234,6 +234,12 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                     self
                 }
         }
+        method STORE(::?CLASS:D \$arr: *@vals) {
+            for @vals.kv -> $k, $v {
+                nqp::r_bindpos($arr, nqp::unbox_i($k), nqp::p6decont($v));
+            }
+            self;
+        }
     }
     multi method PARAMETERIZE_TYPE(Mu:U $t) {
         die "A C array can only hold integers, numbers, strings, CStructs, CPointers or CArrays (not $t.perl())"

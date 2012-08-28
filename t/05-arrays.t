@@ -28,8 +28,7 @@ compile_test_lib('05-arrays');
     
     sub TakeAStringArrayAndReturnTotalLength(CArray[Str]) returns int32 is native("./05-arrays") { * }
     my @parr := CArray[Str].new();
-    @parr[0] = "OMG";
-    @parr[1] = "strings!!!";
+    @parr = <OMG strings!!!>;
     is TakeAStringArrayAndReturnTotalLength(@parr), 13, 'passing string array';
 }
 
