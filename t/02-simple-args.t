@@ -2,7 +2,7 @@ use lib '.';
 use t::CompileTestLib;
 use NativeCall;
 
-say "1..11";
+say "1..12";
 
 compile_test_lib('02-simple-args');
 
@@ -37,5 +37,11 @@ sub wrapped(int) is native('./02-simple-args') { * }
 sub wrapper(int $arg) { wrapped($arg) }
 
 wrapper(1);
+
+# Make sure we can call functions from the C library. Not an issue on Linux,
+# but OS X has a distinction between shared libraries (dylibs) and loadable
+# modules (bundles) which we need to check.
+sub printf(Str) is native('libc') { * }
+printf('ok 12 - printf(3) from libc');
 
 # vim:ft=perl6
