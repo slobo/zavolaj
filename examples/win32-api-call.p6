@@ -1,6 +1,6 @@
 use NativeCall;
 
-sub MessageBoxA(Int, Str, Str, Int)
+sub MessageBoxA(int32, Str, Str, int32)
     returns Int
     is native('user32.dll')
     { * }
