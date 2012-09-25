@@ -146,23 +146,23 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
     method at_pos(CArray:D: $pos) { die "CArray cannot be used without a type" }
     
     my role IntTypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos(::?CLASS:D \$arr: $pos) is rw {
+        multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_i(nqp::r_atpos_i($arr, nqp::unbox_i($pos.Int)))
+                    nqp::p6box_i(nqp::r_atpos_i(arr, nqp::unbox_i($pos.Int)))
                 },
                 STORE => method (int $v) {
-                    nqp::r_bindpos_i($arr, nqp::unbox_i($pos.Int), $v);
+                    nqp::r_bindpos_i(arr, nqp::unbox_i($pos.Int), $v);
                     self
                 }
         }
-        multi method at_pos(::?CLASS:D \$arr: int $pos) is rw {
+        multi method at_pos(::?CLASS:D \arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_i(nqp::r_atpos_i($arr, $pos))
+                    nqp::p6box_i(nqp::r_atpos_i(arr, $pos))
                 },
                 STORE => method (int $v) {
-                    nqp::r_bindpos_i($arr, $pos, $v);
+                    nqp::r_bindpos_i(arr, $pos, $v);
                     self
                 }
         }
@@ -172,23 +172,23 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
     }
     
     my role NumTypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos(::?CLASS:D \$arr: $pos) is rw {
+        multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_n(nqp::r_atpos_n($arr, nqp::unbox_i($pos.Int)))
+                    nqp::p6box_n(nqp::r_atpos_n(arr, nqp::unbox_i($pos.Int)))
                 },
                 STORE => method (num $v) {
-                    nqp::r_bindpos_n($arr, nqp::unbox_i($pos.Int), $v);
+                    nqp::r_bindpos_n(arr, nqp::unbox_i($pos.Int), $v);
                     self
                 }
         }
-        multi method at_pos(::?CLASS:D \$arr: int $pos) is rw {
+        multi method at_pos(::?CLASS:D \arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_n(nqp::r_atpos_n($arr, $pos))
+                    nqp::p6box_n(nqp::r_atpos_n(arr, $pos))
                 },
                 STORE => method (num $v) {
-                    nqp::r_bindpos_n($arr, $pos, $v);
+                    nqp::r_bindpos_n(arr, $pos, $v);
                     self
                 }
         }
@@ -198,23 +198,23 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
     }
     
     my role TypedCArray[::TValue] does Positional[TValue] {
-        multi method at_pos(::?CLASS:D \$arr: $pos) is rw {
+        multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::r_atpos($arr, nqp::unbox_i($pos.Int))
+                    nqp::r_atpos(arr, nqp::unbox_i($pos.Int))
                 },
                 STORE => method ($v) {
-                    nqp::r_bindpos($arr, nqp::unbox_i($pos.Int), nqp::p6decont($v));
+                    nqp::r_bindpos(arr, nqp::unbox_i($pos.Int), nqp::p6decont($v));
                     self
                 }
         }
-        multi method at_pos(::?CLASS:D \$arr: int $pos) is rw {
+        multi method at_pos(::?CLASS:D \arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::r_atpos($arr, $pos)
+                    nqp::r_atpos(arr, $pos)
                 },
                 STORE => method ($v) {
-                    nqp::r_bindpos($arr, $pos, nqp::p6decont($v));
+                    nqp::r_bindpos(arr, $pos, nqp::p6decont($v));
                     self
                 }
         }
