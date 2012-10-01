@@ -102,8 +102,8 @@ by writing a class like this:
 
     class FooHandle is repr('CPointer') {
         # Here are the actual Zavolaj functions.
-        sub Foo_init() returns FooPointer is native("libfoo") { * }
-        sub Foo_free(FooPointer) is native("libfoo") { * }
+        sub Foo_init() returns FooHandle is native("libfoo") { * }
+        sub Foo_free(FooHandle) is native("libfoo") { * }
         
         # Here are the methods we use to expose it to the outside world.
         method new() { Foo_init() }
