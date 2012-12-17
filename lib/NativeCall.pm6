@@ -47,7 +47,7 @@ sub param_list_for(Signature $sig, :$with-typeobj) {
 }
 
 # Builds a hash of type information for the specified return type.
-sub return_hash_for(Signature $s) {
+sub return_hash_for(Signature $s, &r?) {
     my Mu $result := nqp::hash();
     my $returns := $s.returns;
     if $returns ~~ Str {
@@ -120,7 +120,7 @@ my role Native[Routine $r, Str $libname] {
                 nqp::unbox_s(self.?native_symbol // $r.name),      # symbol to call
                 nqp::unbox_s($conv),        # calling convention
                 $arg_info,
-                return_hash_for($r.signature));
+                return_hash_for($r.signature, $r));
             $!setup = 1;
         }
         nqp::nativecall(nqp::p6decont(map_return_type($r.returns)), self,
