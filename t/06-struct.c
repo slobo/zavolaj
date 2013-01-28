@@ -11,6 +11,7 @@
 typedef struct {
     long intval;
     double numval;
+    int8_t byteval;
     long *arr;
 } MyStruct;
 
@@ -35,6 +36,7 @@ DLLEXPORT MyStruct *ReturnAStruct()
     MyStruct *obj = (MyStruct *) malloc(sizeof(MyStruct));
     obj->intval = 17;
     obj->numval = 4.2;
+    obj->byteval = 13;
     obj->arr = (long *) malloc(3*sizeof(long));
     obj->arr[0] = 2;
     obj->arr[1] = 3;
@@ -49,6 +51,8 @@ DLLEXPORT void TakeAStruct(MyStruct *obj)
     printf("ok - C-side int value\n");
     if(obj->numval != -3.7) printf("not ");
     printf("ok - C-side num value\n");
+    if(obj->byteval != 7) printf("not ");
+    printf("ok - C-side int8 value\n");
     if(!obj->arr || obj->arr[0] != 1) printf("not ");
     printf("ok - C-side array value, element 1\n");
     if(!obj->arr || obj->arr[1] != 2) printf("not ");
