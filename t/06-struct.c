@@ -12,6 +12,7 @@ typedef struct {
     long intval;
     double numval;
     int8_t byteval;
+    float  floatval;
     long *arr;
 } MyStruct;
 
@@ -37,6 +38,7 @@ DLLEXPORT MyStruct *ReturnAStruct()
     obj->intval = 17;
     obj->numval = 4.2;
     obj->byteval = 13;
+    obj->floatval = -6.28;
     obj->arr = (long *) malloc(3*sizeof(long));
     obj->arr[0] = 2;
     obj->arr[1] = 3;
