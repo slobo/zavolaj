@@ -60,3 +60,32 @@ DLLEXPORT void TakeAStructArray(Struct **structs) {
     if(structs[2]->value != 13) printf("not ");
     printf("ok - struct in position 2, C-side\n");
 }
+
+DLLEXPORT int8_t *ReturnsAByteArray() {
+    int8_t *arr = malloc(3*sizeof(int8_t));
+    arr[0] = 100;
+    arr[1] = 90;
+    arr[2] = 80;
+    return arr;
+}
+
+DLLEXPORT void TakeAByteArray(int8_t *bytes) {
+    if(bytes[0] != 31) printf("not ");
+    printf("ok - byte in position 0, C-side\n");
+    if(bytes[1] != 28) printf("not ");
+    printf("ok - byte in position 1, C-side\n");
+    if(bytes[2] != 30) printf("not ");
+    printf("ok - byte in position 2, C-side\n");
+}
+
+DLLEXPORT float *ReturnsAFloatArray() {
+    float *arr = malloc(3*sizeof(float));
+    arr[0] = 1.23;
+    arr[1] = 4.56;
+    arr[2] = 7.89;
+    return arr;
+}
+
+DLLEXPORT float SumAFloatArray(float *floats) {
+    return floats[0] + floats[1];
+}

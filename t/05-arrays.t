@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 16;
+plan 26;
 
 compile_test_lib('05-arrays');
 
@@ -75,6 +75,35 @@ compile_test_lib('05-arrays');
 
     # runs tests no 13, 14, 15
     TakeAStructArray(@arr);
+}
+
+{
+    sub ReturnsAByteArray() returns CArray[int8] is native("./05-arrays") { * }
+    my @rarr := ReturnsAByteArray();
+    is @rarr[0], 100, 'byte in element 0';
+    is @rarr[1], 90,  'byte in element 1';
+    is @rarr[2], 80,  'byte in element 2';
+
+    sub TakeAByteArray(CArray[int8]) is native("./05-arrays") { * }
+    my @parr := CArray[int8].new;
+    @parr[0] = 31;
+    @parr[1] = 28;
+    @parr[2] = 30;
+    TakeAByteArray(@parr);
+}
+
+{
+    sub ReturnsAFloatArray() returns CArray[num32] is native("./05-arrays") { * }
+    my @rarr := ReturnsAFloatArray();
+    is_approx @rarr[0], 1.23e0, 'float in element 0';
+    is_approx @rarr[1], 4.56e0, 'float in element 1';
+    is_approx @rarr[2], 7.89e0, 'float in element 2';
+
+    sub SumAFloatArray(CArray[num32]) returns num32 is native("./05-arrays") { * }
+    my @parr := CArray[num32].new;
+    @parr[0] = 12.3e0;
+    @parr[1] = 45.6e0;
+    is_approx SumAFloatArray(@parr), 57.9e0, 'sum of float array';
 }
 
 # vim:ft=perl6
