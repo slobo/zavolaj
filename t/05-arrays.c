@@ -61,15 +61,15 @@ DLLEXPORT void TakeAStructArray(Struct **structs) {
     printf("ok - struct in position 2, C-side\n");
 }
 
-DLLEXPORT int8_t *ReturnsAByteArray() {
-    int8_t *arr = malloc(3*sizeof(int8_t));
+DLLEXPORT char *ReturnsAByteArray() {
+    char *arr = malloc(3*sizeof(char));
     arr[0] = 100;
     arr[1] = 90;
     arr[2] = 80;
     return arr;
 }
 
-DLLEXPORT void TakeAByteArray(int8_t *bytes) {
+DLLEXPORT void TakeAByteArray(char *bytes) {
     if(bytes[0] != 31) printf("not ");
     printf("ok - byte in position 0, C-side\n");
     if(bytes[1] != 28) printf("not ");

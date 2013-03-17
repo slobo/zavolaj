@@ -11,7 +11,7 @@
 typedef struct {
     long intval;
     double numval;
-    int8_t byteval;
+    char byteval;
     float  floatval;
     long *arr;
 } MyStruct;
