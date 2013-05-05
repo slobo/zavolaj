@@ -35,3 +35,8 @@ DLLEXPORT char * ReturnString()
 {
     return "epic cuteness";
 }
+
+DLLEXPORT char * ReturnNullString()
+{
+    return NULL;
+}

@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan(6);
+plan(7);
 
 compile_test_lib('03-simple-returns');
 
@@ -24,3 +24,6 @@ is_approx ReturnFloat(), -4.5e0, 'returning float works';
 
 sub ReturnString() returns Str is native('./03-simple-returns') { * }
 is ReturnString(), "epic cuteness", 'returning string works';
+
+sub ReturnNullString returns Str is native('./03-simple-returns') { * }
+nok ReturnNullString().defined, 'returning null string pointer';
