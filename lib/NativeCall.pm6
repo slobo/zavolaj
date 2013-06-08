@@ -123,8 +123,8 @@ my role Native[Routine $r, Str $libname] {
                 return_hash_for($r.signature, $r));
             $!setup = 1;
         }
-        nqp::nativecall(nqp::p6decont(map_return_type($r.returns)), self,
-            nqp::getattr(nqp::p6decont($args), Capture, '$!list'))
+        nqp::nativecall(nqp::decont(map_return_type($r.returns)), self,
+            nqp::getattr(nqp::decont($args), Capture, '$!list'))
     }
 }
 
@@ -204,7 +204,7 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                     nqp::r_atpos(arr, nqp::unbox_i($pos.Int))
                 },
                 STORE => method ($v) {
-                    nqp::r_bindpos(arr, nqp::unbox_i($pos.Int), nqp::p6decont($v));
+                    nqp::r_bindpos(arr, nqp::unbox_i($pos.Int), nqp::decont($v));
                     self
                 }
         }
@@ -214,7 +214,7 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                     nqp::r_atpos(arr, $pos)
                 },
                 STORE => method ($v) {
-                    nqp::r_bindpos(arr, $pos, nqp::p6decont($v));
+                    nqp::r_bindpos(arr, $pos, nqp::decont($v));
                     self
                 }
         }
