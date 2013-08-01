@@ -261,13 +261,15 @@ class CStr is repr('CStr') {
 }
 
 role ExplicitlyManagedString {
-    has CStr $.cstr is rw;
+    has CStr $!cstr;
+    method cstr { $!cstr };
+    method setCstr (CStr $new) { $!cstr = $new }
 }
 
 multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export(:DEFAULT,
 :utils) {
     $x does ExplicitlyManagedString;
-    $x.cstr = pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]);
+    $x.setCstr(pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]));
 }
 
 multi refresh($obj) is export(:DEFAULT, :utils) {
