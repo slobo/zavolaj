@@ -51,6 +51,7 @@ DLLEXPORT void TakeADouble(double x)
         printf("ok 7 - got passed double -6.9\n", x);
     else
         printf("not ok 7 - got passed double -6.9\n", x);
+    fflush(stdout);
 }
 
 DLLEXPORT void TakeAFloat(float x)
@@ -59,11 +60,13 @@ DLLEXPORT void TakeAFloat(float x)
         printf("ok 8 - got passed float 4.2\n", x);
     else
         printf("not ok 8 - got passed float 4.2\n", x);
+    fflush(stdout);
 }
 
 DLLEXPORT void TakeAString(char *pass_msg)
 {
     printf("%s\n", pass_msg);
+    fflush(stdout);
 }
 
 static char *cached_str = NULL;
@@ -73,8 +76,10 @@ DLLEXPORT void SetString(char *str) {
 
 DLLEXPORT void PrintString() {
     printf("%s\n", cached_str);
+    fflush(stdout);
 }
 
 DLLEXPORT void wrapped(int n) {
-    printf("ok - wrapped sub\n");
+    printf("ok 11 - wrapped sub\n");
+    fflush(stdout);
 }
