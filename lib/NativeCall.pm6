@@ -249,25 +249,15 @@ multi trait_mod:<is>(Routine $p, :$encoded!) is export(:DEFAULT, :traits) {
     $p does NativeCallEncoded[$encoded];
 }
 
-class CStr is repr('CStr') {
-    my role Encoding[$encoding] {
-        method encoding() { $encoding }
-    }
-
-    multi method PARAMETERIZE_TYPE(Str:D $encoding) {
-        die "Unknown string encoding for native call: $encoding" if not $encoding eq any('utf8', 'utf16', 'ascii');
-        self but Encoding[$encoding];
-    }
-}
-
 role ExplicitlyManagedString {
-    has CStr $.cstr is rw;
+    has $.cstr is rw;
 }
 
 multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export(:DEFAULT,
 :utils) {
     $x does ExplicitlyManagedString;
-    $x.cstr = pir::repr_box_str__PsP(nqp::unbox_s($x), CStr[$encoding]);
+    my $class = class CStr is repr('CStr') { method encoding() { $encoding; } };
+    $x.cstr = nqp::box_s(nqp::unbox_s($x), $class);
 }
 
 multi refresh($obj) is export(:DEFAULT, :utils) {

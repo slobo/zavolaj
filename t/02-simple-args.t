@@ -25,13 +25,12 @@ sub TakeAString(Str) is native('./02-simple-args') { * }
 TakeAString('ok 9 - passed a string');
 
 # Explicitly managing strings
-say 'ok 10 - SKIP issue 28: Cannot create rw-accessors for natively typed attribute';
-# sub SetString(Str) is native('./02-simple-args') { * }
-# sub PrintString() is native('./02-simple-args') { * }
-# my $str = 'ok 10 - delayed string print';
-# explicitly-manage($str);
-# SetString($str);
-# PrintString();
+sub SetString(Str) is native('./02-simple-args') { * }
+sub PrintString() is native('./02-simple-args') { * }
+my $str = 'ok 10 - delayed string print';
+explicitly-manage($str);
+SetString($str);
+PrintString();
 
 # Make sure wrapped subs work
 sub wrapped(int) is native('./02-simple-args') { * }
