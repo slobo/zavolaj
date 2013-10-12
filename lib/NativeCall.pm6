@@ -78,7 +78,7 @@ my %type_map =
     'Callable' => 'callback';
 sub type_code_for(Mu ::T) {
     return %type_map{T.^name}
-        if %type_map.exists(T.^name);
+        if %type_map{T.^name}:exists;
     return 'cstruct'
         if T.REPR eq 'CStruct';
     return 'cpointer'
