@@ -149,20 +149,20 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
         multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_i(nqp::r_atpos_i(arr, nqp::unbox_i($pos.Int)))
+                    nqp::p6box_i(nqp::atpos_i(arr, nqp::unbox_i($pos.Int)))
                 },
                 STORE => method (int $v) {
-                    nqp::r_bindpos_i(arr, nqp::unbox_i($pos.Int), $v);
+                    nqp::bindpos_i(arr, nqp::unbox_i($pos.Int), $v);
                     self
                 }
         }
         multi method at_pos(::?CLASS:D \arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_i(nqp::r_atpos_i(arr, $pos))
+                    nqp::p6box_i(nqp::atpos_i(arr, $pos))
                 },
                 STORE => method (int $v) {
-                    nqp::r_bindpos_i(arr, $pos, $v);
+                    nqp::bindpos_i(arr, $pos, $v);
                     self
                 }
         }
@@ -175,20 +175,20 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
         multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_n(nqp::r_atpos_n(arr, nqp::unbox_i($pos.Int)))
+                    nqp::p6box_n(nqp::atpos_n(arr, nqp::unbox_i($pos.Int)))
                 },
                 STORE => method (num $v) {
-                    nqp::r_bindpos_n(arr, nqp::unbox_i($pos.Int), $v);
+                    nqp::bindpos_n(arr, nqp::unbox_i($pos.Int), $v);
                     self
                 }
         }
         multi method at_pos(::?CLASS:D \arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::p6box_n(nqp::r_atpos_n(arr, $pos))
+                    nqp::p6box_n(nqp::atpos_n(arr, $pos))
                 },
                 STORE => method (num $v) {
-                    nqp::r_bindpos_n(arr, $pos, $v);
+                    nqp::bindpos_n(arr, $pos, $v);
                     self
                 }
         }
@@ -201,20 +201,20 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
         multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::r_atpos(arr, nqp::unbox_i($pos.Int))
+                    nqp::atpos(arr, nqp::unbox_i($pos.Int))
                 },
                 STORE => method ($v) {
-                    nqp::r_bindpos(arr, nqp::unbox_i($pos.Int), nqp::decont($v));
+                    nqp::bindpos(arr, nqp::unbox_i($pos.Int), nqp::decont($v));
                     self
                 }
         }
         multi method at_pos(::?CLASS:D \arr: int $pos) is rw {
             Proxy.new:
                 FETCH => method () {
-                    nqp::r_atpos(arr, $pos)
+                    nqp::atpos(arr, $pos)
                 },
                 STORE => method ($v) {
-                    nqp::r_bindpos(arr, $pos, nqp::decont($v));
+                    nqp::bindpos(arr, $pos, nqp::decont($v));
                     self
                 }
         }
