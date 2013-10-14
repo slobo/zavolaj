@@ -111,10 +111,12 @@ my role Native[Routine $r, Str $libname] {
         unless $!setup {
             my Mu $arg_info := param_list_for($r.signature);
             my str $conv = self.?native_call_convention || '';
-            my $realname = 
-                !$libname.DEFINITE   ?? "" !!
-                $libname ~~ /\.\w+$/ ?? $libname !!
-                                        "$libname$*VM<config><load_ext>";
+            my $realname;
+            if !$libname.DEFINITE { $realname = ""; }
+            elsif $libname ~~ /\.\w+$/ { $libname }
+            elsif $*VM<config><load_ext> :exists { $realname = "$libname$*VM<config><load_ext>"; }
+            # TODO: Actual extension guessing
+            else { $realname = "{$libname}.so"; }
             nqp::buildnativecall(self,
                 nqp::unbox_s($realname),    # library name
                 nqp::unbox_s(self.?native_symbol // $r.name),      # symbol to call
