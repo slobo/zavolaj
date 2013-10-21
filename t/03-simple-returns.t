@@ -25,5 +25,6 @@ is_approx ReturnFloat(), -4.5e0, 'returning float works';
 sub ReturnString() returns Str is native('./03-simple-returns') { * }
 is ReturnString(), "epic cuteness", 'returning string works';
 
+todo 'Rakudo/JVM bug' if $*VM<name> eq 'jvm';
 sub ReturnNullString returns Str is native('./03-simple-returns') { * }
 nok ReturnNullString().defined, 'returning null string pointer';
