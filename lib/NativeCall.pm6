@@ -259,7 +259,7 @@ multi explicitly-manage(Str $x is rw, :$encoding = 'utf8') is export(:DEFAULT,
 :utils) {
     $x does ExplicitlyManagedString;
     my $class = class CStr is repr('CStr') { method encoding() { $encoding; } };
-    $x.cstr = nqp::box_s(nqp::unbox_s($x), $class);
+    $x.cstr = nqp::box_s(nqp::unbox_s($x), nqp::decont($class));
 }
 
 multi refresh($obj) is export(:DEFAULT, :utils) {
