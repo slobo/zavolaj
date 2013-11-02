@@ -28,14 +28,9 @@ TakeAString('ok 9 - passed a string');
 sub SetString(Str) is native('./02-simple-args') { * }
 sub PrintString() is native('./02-simple-args') { * }
 my $str = 'ok 10 - delayed string print';
-if $*VM<name> eq 'jvm' {
-    say $str ~ ' # SKIP CStr REPR non-functional on JVM'
-}
-else {
-    explicitly-manage($str);
-    SetString($str);
-    PrintString();
-}
+explicitly-manage($str);
+SetString($str);
+PrintString();
 
 # Make sure wrapped subs work
 sub wrapped(int) is native('./02-simple-args') { * }
