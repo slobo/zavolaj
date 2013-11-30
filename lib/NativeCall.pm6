@@ -113,7 +113,7 @@ my role Native[Routine $r, Str $libname] {
             my str $conv = self.?native_call_convention || '';
             my $realname;
             if !$libname.DEFINITE { $realname = ""; }
-            elsif $libname ~~ /\.\w+$/ { $libname }
+            elsif $libname ~~ /\.\w+$/ { $realname = $libname }
             elsif $*VM<config><load_ext> :exists { $realname = "$libname$*VM<config><load_ext>"; }
             # TODO: Actual extension guessing
             else { $realname = "{$libname}.so"; }
