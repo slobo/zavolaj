@@ -92,9 +92,8 @@ sub type_code_for(Mu ::T) {
 
 multi sub map_return_type(Mu $type) { Mu }
 multi sub map_return_type($type) {
-    return Int if nqp::istype($type, Int);
-    return Num if nqp::istype($type, Num);
-    return $type
+    nqp::istype($type, Int) ?? Int
+                            !! nqp::istype($type, Num) ?? Num !! $type;
 }
 
 my role NativeCallSymbol[Str $name] {
