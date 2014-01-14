@@ -92,9 +92,9 @@ sub type_code_for(Mu ::T) {
 
 multi sub map_return_type(Mu $type) { Mu }
 multi sub map_return_type($type) {
-    $type === int8 || $type === int16 || $type === int32 || $type === int ?? Int !!
-    $type === num32 || $type === num64 || $type === num                   ?? Num !!
-                                                                             $type
+    return Int if nqp::istype($type, Int);
+    return Num if nqp::istype($type, Num);
+    return $type
 }
 
 my role NativeCallSymbol[Str $name] {
@@ -106,6 +106,7 @@ my role NativeCallSymbol[Str $name] {
 my role Native[Routine $r, Str $libname] {
     has int $!setup;
     has native_callsite $!call is box_target;
+    has Mu $!rettype;
     
     method postcircumfix:<( )>($args) {
         unless $!setup {
@@ -124,9 +125,9 @@ my role Native[Routine $r, Str $libname] {
                 $arg_info,
                 return_hash_for($r.signature, $r));
             $!setup = 1;
+            $!rettype := nqp::decont(map_return_type($r.returns));
         }
-        nqp::nativecall(nqp::decont(map_return_type($r.returns)), self,
-            nqp::getattr(nqp::decont($args), Capture, '$!list'))
+        nqp::nativecall($!rettype, self, nqp::getattr(nqp::decont($args), Capture, '$!list'))
     }
 }
 
