@@ -42,7 +42,7 @@ compile_test_lib('05-arrays');
 
 {
     my @arr := CArray[OpaquePointer].new;
-    @arr[1] = OpaquePointer;
+    @arr[1] = OpaquePointer.new;
     my $x = @arr[0];
     pass 'getting uninitialized element in managed array';
 }
