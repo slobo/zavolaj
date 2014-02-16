@@ -27,7 +27,7 @@ sub param_hash_for(Parameter $p, :$with-typeobj) {
     elsif $type ~~ Callable {
         nqp::bindkey($result, 'type', nqp::unbox_s(type_code_for($p.type)));
         my $info := param_list_for($p.sub_signature, :with-typeobj);
-        nqp::unshift($info, return_hash_for($p.sub_signature));
+        nqp::unshift($info, return_hash_for($p.sub_signature, :with-typeobj));
         nqp::bindkey($result, 'callback_args', $info);
     }
     else {
@@ -47,9 +47,10 @@ sub param_list_for(Signature $sig, :$with-typeobj) {
 }
 
 # Builds a hash of type information for the specified return type.
-sub return_hash_for(Signature $s, &r?) {
+sub return_hash_for(Signature $s, &r?, :$with-typeobj) {
     my Mu $result := nqp::hash();
     my $returns := $s.returns;
+    nqp::bindkey($result, 'typeobj', $returns) if $with-typeobj;
     if $returns ~~ Str {
         my $enc := &r.?native_call_encoded() || 'utf8';
         nqp::bindkey($result, 'type', nqp::unbox_s(string_encoding_to_nci_type($enc)));
