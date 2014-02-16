@@ -50,6 +50,6 @@ save_ref($s);
 atadistance();
 isnt($s.ptr.deref, 42, 'struct value before refresh');
 refresh($s);
-is($s.ptr.deref, 42, 'struct value before refresh');
+is($s.ptr.deref, 42, 'struct value after refresh');
 
 # vim:ft=perl6
