@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 8;
+plan 7;
 
 compile_test_lib('07-writebarrier');
 
