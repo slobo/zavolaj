@@ -1,11 +1,6 @@
 module t::CompileTestLib;
 
 sub compile_test_lib($name) is export {
-    # TODO: We need to figure out a way to (more or less) sanely attempt to
-    # build the native libs we use for testing, even on platforms where the VM
-    # doesn't tell us everything we want to know.
-    return if $*VM<name> eq 'jvm';
-
     my ($c_line, $l_line);
     if $*VM<name> eq 'parrot' {
         my $o  = $*VM<config><o>;
@@ -20,6 +15,12 @@ sub compile_test_lib($name) is export {
         $c_line = "$*VM<config><cc> -c $*VM<config><ccshared> $*VM<config><ccout>$name$o $*VM<config><cflags> t/$name.c";
         $l_line = "$*VM<config><ld> $*VM<config><ldshared> $*VM<config><ldflags> " ~
             "$*VM<config><ldlibs> $*VM<config><ldout>$name$so $name$o";
+    }
+    elsif $*VM<name> eq 'jvm' {
+        #say "$*VM<config><nativecall.ccdlflags>";
+        my $cfg = $*VM<config>;
+        $c_line = "$cfg<nativecall.cc> -c $cfg<nativecall.ccdlflags> -o$name$cfg<nativecall.o> $cfg<nativecall.ccflags> t/$name.c";
+        $l_line = "$cfg<nativecall.ld> $cfg<nativecall.lddlflags> $cfg<nativecall.ldflags> -o$name.$cfg<nativecall.so> $name$cfg<nativecall.o>";
     }
     else {
         die "Unknown VM; don't know how to compile test libraires";
