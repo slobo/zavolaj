@@ -126,8 +126,8 @@ my StructStruct $ss = ReturnAStructStruct();
 is $ss.a.first,   7, 'field 1 from struct 1 in struct';
 is $ss.a.second, 11, 'field 2 from struct 1 in struct';
 
-is_approx $ss.b.first,  3.7e0, 'field 1 from struct 1 in struct';
-is_approx $ss.b.second, 0.1e0, 'field 2 from struct 1 in struct';
+is_approx $ss.b.first,  3.7e0, 'field 1 from struct 2 in struct';
+is_approx $ss.b.second, 0.1e0, 'field 2 from struct 2 in struct';
 
 my PointerStruct $x = ReturnAPointerStruct();
 is $x.p.deref, 19, 'CPointer object in struct';
