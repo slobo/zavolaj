@@ -19,7 +19,7 @@ class MyStruct is repr('CStruct') {
         $!byte = 7;
         $!num = -3.7e0;
         $!float = 3.14e0;
-        my $arr = CArray[int].new();
+        my $arr := CArray[int].new();
         $arr[0] = 1;
         $arr[1] = 2;
         $!arr := $arr;
