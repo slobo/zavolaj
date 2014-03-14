@@ -147,10 +147,10 @@ my role NativeCallEncoded[$name] {
 my class OpaquePointer is export(:types, :DEFAULT) is repr('CPointer') { }
 
 # CArray class, used to represent C arrays.
-my class CArray is export(:types, :DEFAULT) is repr('CArray') {
+my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(OpaquePointer) {
     method at_pos(CArray:D: $pos) { die "CArray cannot be used without a type" }
     
-    my role IntTypedCArray[::TValue] does Positional[TValue] {
+    my role IntTypedCArray[::TValue] does Positional[TValue] is CArray is repr('CArray') is array_type(TValue) {
         multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
@@ -173,10 +173,11 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
         }
     }
     multi method PARAMETERIZE_TYPE(Int:U $t) {
-        self but IntTypedCArray[$t.WHAT]
+        my \typed := IntTypedCArray[$t.WHAT];
+        typed.HOW.make_pun(typed);
     }
     
-    my role NumTypedCArray[::TValue] does Positional[TValue] {
+    my role NumTypedCArray[::TValue] does Positional[TValue] is CArray is repr('CArray') is array_type(TValue) {
         multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
@@ -199,10 +200,11 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
         }
     }
     multi method PARAMETERIZE_TYPE(Num:U $t) {
-        self but NumTypedCArray[$t.WHAT]
+        my \typed := NumTypedCArray[$t.WHAT];
+        typed.HOW.make_pun(typed);
     }
     
-    my role TypedCArray[::TValue] does Positional[TValue] {
+    my role TypedCArray[::TValue] does Positional[TValue] is CArray is repr('CArray') is array_type(TValue) {
         multi method at_pos(::?CLASS:D \arr: $pos) is rw {
             Proxy.new:
                 FETCH => method () {
@@ -224,10 +226,11 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') {
                 }
         }
     }
-    multi method PARAMETERIZE_TYPE(Mu:U $t) {
-        die "A C array can only hold integers, numbers, strings, CStructs, CPointers or CArrays (not $t.perl())"
-            unless $t === Str || $t.REPR eq 'CStruct' | 'CPointer' | 'CArray';
-        self but TypedCArray[$t.WHAT]
+    multi method PARAMETERIZE_TYPE(Mu:U \t) {
+        die "A C array can only hold integers, numbers, strings, CStructs, CPointers or CArrays (not {t.^name})"
+            unless t === Str || t.REPR eq 'CStruct' | 'CPointer' | 'CArray';
+        my \typed := TypedCArray[t];
+        typed.HOW.make_pun(typed);
     }
 }
 
