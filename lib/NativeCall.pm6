@@ -117,7 +117,8 @@ my role Native[Routine $r, Str $libname] {
             elsif $libname ~~ /\.\w+$/ { $realname = $libname }
             elsif $*VM<config><load_ext> :exists { $realname = "$libname$*VM<config><load_ext>"; }
             elsif $*VM<config><dll> :exists { $realname = "$libname$*VM<config><dll>.subst('%s', '')"; }
-            # TODO: Actual extension guessing
+            elsif $*OS eq 'MSWin32' { $realname = "{$libname}.dll"; }
+            # TODO: more extension guessing
             else { $realname = "{$libname}.so"; }
             nqp::buildnativecall(self,
                 nqp::unbox_s($realname),    # library name
