@@ -15,8 +15,8 @@ class IntPtr is repr('CPointer') {
 class Structy is repr('CStruct') {
     has IntPtr $.ptr;
 
-    method set($ptr) {
-        $!ptr := $ptr;
+    method set(\ptr) {
+        $!ptr := ptr;
     }
 }
 
