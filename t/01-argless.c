@@ -14,5 +14,6 @@ DLLEXPORT void Argless()
 
 DLLEXPORT void long_and_complicated_name()
 {
-    printf("ok 3 - called long_and_complicated_name");
+    printf("ok 3 - called long_and_complicated_name\n");
+    fflush(stdout);
 }
