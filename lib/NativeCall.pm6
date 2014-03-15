@@ -18,7 +18,7 @@ sub string_encoding_to_nci_type($enc) {
 sub param_hash_for(Parameter $p, :$with-typeobj) {
     my Mu $result := nqp::hash();
     my $type := $p.type();
-    nqp::bindkey($result, 'typeobj', $type) if $with-typeobj;
+    nqp::bindkey($result, 'typeobj', nqp::decont($type)) if $with-typeobj;
     if $type ~~ Str {
         my $enc := $p.?native_call_encoded() || 'utf8';
         nqp::bindkey($result, 'type', nqp::unbox_s(string_encoding_to_nci_type($enc)));
@@ -50,7 +50,7 @@ sub param_list_for(Signature $sig, :$with-typeobj) {
 sub return_hash_for(Signature $s, &r?, :$with-typeobj) {
     my Mu $result := nqp::hash();
     my $returns := $s.returns;
-    nqp::bindkey($result, 'typeobj', $returns) if $with-typeobj;
+    nqp::bindkey($result, 'typeobj', nqp::decont($returns)) if $with-typeobj;
     if $returns ~~ Str {
         my $enc := &r.?native_call_encoded() || 'utf8';
         nqp::bindkey($result, 'type', nqp::unbox_s(string_encoding_to_nci_type($enc)));
