@@ -116,7 +116,11 @@ my role Native[Routine $r, Str $libname] {
             if !$libname.DEFINITE { $realname = ""; }
             elsif $libname ~~ /\.\w+$/ { $realname = $libname }
             elsif $*VM<config><load_ext> :exists { $realname = "$libname$*VM<config><load_ext>"; }
-            elsif $*VM<config><dll> :exists { $realname = "$libname$*VM<config><dll>.subst('%s', '')"; }
+            elsif $*VM<config><dll> :exists { 
+                my $ext = $*VM<config><dll>;
+                $ext ~~ s/^.*\%s//;
+                $realname = "$libname$ext";
+            }
             elsif $*OS eq 'MSWin32' { $realname = "{$libname}.dll"; }
             # TODO: more extension guessing
             else { $realname = "{$libname}.so"; }
