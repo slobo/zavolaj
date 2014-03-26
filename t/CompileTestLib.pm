@@ -11,7 +11,8 @@ sub compile_test_lib($name) is export {
     }
     elsif $*VM<name> eq 'moar' {
         my $o  = $*VM<config><obj>;
-        my $so = $*VM<config><dll>.subst('%s', '');
+        my $so = $*VM<config><dll>;
+        $so ~~ s/^.*\%s//;
         $c_line = "$*VM<config><cc> -c $*VM<config><ccshared> $*VM<config><ccout>$name$o $*VM<config><cflags> t/$name.c";
         $l_line = "$*VM<config><ld> $*VM<config><ldshared> $*VM<config><ldflags> " ~
             "$*VM<config><ldlibs> $*VM<config><ldout>$name$so $name$o";
