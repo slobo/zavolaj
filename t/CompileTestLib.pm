@@ -24,7 +24,7 @@ sub compile_test_lib($name) is export {
         $l_line = "$cfg<nativecall.ld> $cfg<nativecall.libs> $cfg<nativecall.lddlflags> $cfg<nativecall.ldflags> $cfg<nativecall.ldout>$name.$cfg<nativecall.so> $name$cfg<nativecall.o>";
     }
     else {
-        die "Unknown VM; don't know how to compile test libraires";
+        die "Unknown VM; don't know how to compile test libraries";
     }
     shell($c_line);
     shell($l_line);
