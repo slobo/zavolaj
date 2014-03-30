@@ -21,7 +21,7 @@ sub compile_test_lib($name) is export {
         #say "$*VM<config><nativecall.ccdlflags>";
         my $cfg = $*VM<config>;
         $c_line = "$cfg<nativecall.cc> -c $cfg<nativecall.ccdlflags> -o$name$cfg<nativecall.o> $cfg<nativecall.ccflags> t/$name.c";
-        $l_line = "$cfg<nativecall.ld> $cfg<nativecall.libs> $cfg<nativecall.lddlflags> $cfg<nativecall.ldflags> $cfg<nativecall.ldout>$name.$cfg<nativecall.so> $name$cfg<nativecall.o>";
+        $l_line = "$cfg<nativecall.ld> $cfg<nativecall.perllibs> $cfg<nativecall.lddlflags> $cfg<nativecall.ldflags> $cfg<nativecall.ldout>$name.$cfg<nativecall.so> $name$cfg<nativecall.o>";
     }
     else {
         die "Unknown VM; don't know how to compile test libraries";
