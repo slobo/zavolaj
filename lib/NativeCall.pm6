@@ -175,6 +175,18 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(Opaq
                     self
                 }
         }
+        multi method assign_pos(::?CLASS:D \arr: int $pos, int $assignee) {
+            nqp::bindpos_i(nqp::decont(arr), $pos, $assignee);
+        }
+        multi method assign_pos(::?CLASS:D \arr: Int $pos, int $assignee) {
+            nqp::bindpos_i(nqp::decont(arr), nqp::unbox_i($pos), $assignee);
+        }
+        multi method assign_pos(::?CLASS:D \arr: Int $pos, Int $assignee) {
+            nqp::bindpos_i(nqp::decont(arr), nqp::unbox_i($pos), nqp::unbox_i($assignee));
+        }
+        multi method assign_pos(::?CLASS:D \arr: int $pos, Int $assignee) {
+            nqp::bindpos_i(nqp::decont(arr), $pos, nqp::unbox_i($assignee));
+        }
     }
     multi method PARAMETERIZE_TYPE(Int:U $t) {
         my \typed := IntTypedCArray[$t.WHAT];
@@ -202,6 +214,18 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(Opaq
                     self
                 }
         }
+        multi method assign_pos(::?CLASS:D \arr: int $pos, num $assignee) {
+            nqp::bindpos_n(nqp::decont(arr), $pos, $assignee);
+        }
+        multi method assign_pos(::?CLASS:D \arr: Int $pos, num $assignee) {
+            nqp::bindpos_n(nqp::decont(arr), nqp::unbox_i($pos), $assignee);
+        }
+        multi method assign_pos(::?CLASS:D \arr: Int $pos, Num $assignee) {
+            nqp::bindpos_n(nqp::decont(arr), nqp::unbox_i($pos), nqp::unbox_n($assignee));
+        }
+        multi method assign_pos(::?CLASS:D \arr: int $pos, Num $assignee) {
+            nqp::bindpos_n(nqp::decont(arr), $pos, nqp::unbox_n($assignee));
+        }
     }
     multi method PARAMETERIZE_TYPE(Num:U $t) {
         my \typed := NumTypedCArray[$t.WHAT];
@@ -228,6 +252,12 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(Opaq
                     nqp::bindpos(nqp::decont(arr), $pos, nqp::decont($v));
                     self
                 }
+        }
+        multi method assign_pos(::?CLASS:D \arr: int $pos, \assignee) {
+            nqp::bindpos(nqp::decont(arr), $pos, nqp::decont(assignee));
+        }
+        multi method assign_pos(::?CLASS:D \arr: Int $pos, \assignee) {
+            nqp::bindpos(nqp::decont(arr), nqp::unbox_i($pos), nqp::decont(assignee));
         }
     }
     multi method PARAMETERIZE_TYPE(Mu:U \t) {
