@@ -254,10 +254,10 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(Opaq
                 }
         }
         multi method assign_pos(::?CLASS:D \arr: int $pos, \assignee) {
-            nqp::bindpos_n(nqp::decont(arr), $pos, nqp::decont(assignee));
+            nqp::bindpos(nqp::decont(arr), $pos, nqp::decont(assignee));
         }
         multi method assign_pos(::?CLASS:D \arr: Int $pos, \assignee) {
-            nqp::bindpos_n(nqp::decont(arr), nqp::unbox_i($pos), nqp::decont(assignee));
+            nqp::bindpos(nqp::decont(arr), nqp::unbox_i($pos), nqp::decont(assignee));
         }
     }
     multi method PARAMETERIZE_TYPE(Mu:U \t) {
