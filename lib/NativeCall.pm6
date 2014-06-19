@@ -115,9 +115,9 @@ my role Native[Routine $r, Str $libname] {
             my $realname;
             if !$libname.DEFINITE { $realname = ""; }
             elsif $libname ~~ /\.\w+$/ { $realname = $libname }
-            elsif $*VM<config><load_ext> :exists { $realname = "$libname$*VM<config><load_ext>"; }
-            elsif $*VM<config><dll> :exists { 
-                my $ext = $*VM<config><dll>;
+            elsif $*VM.config<load_ext> :exists { $realname = $libname ~ $*VM.config<load_ext> }
+            elsif $*VM.config<dll> :exists {
+                my $ext = $*VM.config<dll>;
                 $ext ~~ s/^.*\%s//;
                 $realname = "$libname$ext";
             }
