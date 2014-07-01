@@ -148,7 +148,32 @@ my role NativeCallEncoded[$name] {
 }
 
 # Expose an OpaquePointer class for working with raw pointers.
-my class OpaquePointer is export(:types, :DEFAULT) is repr('CPointer') { }
+my class OpaquePointer is export(:types, :DEFAULT) is repr('CPointer') {
+    multi method new() {
+        self.CREATE()
+    }
+    multi method new(int $addr) {
+        nqp::box_i($addr, OpaquePointer)
+    }
+    multi method new(Int $addr) {
+        nqp::box_i(nqp::unbox_i(nqp::decont($addr)), OpaquePointer)
+    }
+    method Int(OpaquePointer:D:) {
+        nqp::p6box_i(nqp::unbox_i(nqp::decont(self)))
+    }
+    method Numeric(OpaquePointer:D:) { self.Int }
+    multi method gist(OpaquePointer:U:) { '(OpaquePointer)' }
+    multi method gist(OpaquePointer:D:) {
+        if self.Int -> $addr {
+            'OpaquePointer<' ~ $addr.fmt('%#x') ~ '>'
+        }
+        else {
+            'OpaquePointer<NULL>'
+        }
+    }
+    multi method perl(OpaquePointer:U:) { 'OpaquePointer' }
+    multi method perl(OpaquePointer:D:) { 'OpaquePointer.new(' ~ self.Int ~ ')' }
+}
 
 # CArray class, used to represent C arrays.
 my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(OpaquePointer) {
