@@ -8,12 +8,12 @@
 
 DLLEXPORT void * ReturnSomePointer()
 {
-    char *x = "ok 1 - Got passed back the pointer I returned";
+    char *x = "Got passed back the pointer I returned";
     return x;
 }
 
-DLLEXPORT void TakeSomePointer(void *ptr)
+DLLEXPORT int CompareSomePointer(void *ptr)
 {
-    printf("%s\n", (char *) ptr);
-    fflush(stdout);
+    int x = strcmp("Got passed back the pointer I returned", ptr) == 0;
+    return x;
 }
