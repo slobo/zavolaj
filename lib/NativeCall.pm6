@@ -332,22 +332,4 @@ multi refresh($obj) is export(:DEFAULT, :utils) {
     1;
 }
 
-sub nativecast($target-type, $source) is export(:DEFAULT) {
-    my $result = nqp::nativecast(nqp::decont($target-type), nqp::decont($source));
-    if $result.defined {
-        if nqp::isint($result) {
-            nqp::p6box_i($result);
-        }
-        elsif nqp::isnum($result) {
-            nqp::p6box_n($result);
-        }
-        else {
-            $result;
-        }
-    }
-    else {
-        $result;
-    }
-}
-
 # vim:ft=perl6
