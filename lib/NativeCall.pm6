@@ -333,7 +333,7 @@ multi refresh($obj) is export(:DEFAULT, :utils) {
 }
 
 sub nativecast($target-type, $source) is export(:DEFAULT) {
-    my $result = nqp::nativecast(nqp::decont($target-type), nqp::decont($source));
+    my Mu $result := nqp::nativecallcast(nqp::decont($target-type), nqp::decont($source));
     if $result.defined {
         if nqp::isint($result) {
             nqp::p6box_i($result);
