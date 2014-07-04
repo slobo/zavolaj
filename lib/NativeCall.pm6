@@ -341,6 +341,9 @@ sub nativecast($target-type, $source) is export(:DEFAULT) {
         elsif nqp::isnum($result) {
             nqp::p6box_n($result);
         }
+        elsif nqp::isstr($result) {
+            nqp::p6box_s($result);
+        }
         else {
             $result;
         }
