@@ -333,24 +333,8 @@ multi refresh($obj) is export(:DEFAULT, :utils) {
 }
 
 sub nativecast($target-type, $source) is export(:DEFAULT) {
-    my Mu $result := nqp::nativecallcast(nqp::decont($target-type), nqp::decont($source));
-    if $result.defined {
-        if nqp::isint($result) {
-            nqp::p6box_i($result);
-        }
-        elsif nqp::isnum($result) {
-            nqp::p6box_n($result);
-        }
-        elsif nqp::isstr($result) {
-            nqp::p6box_s($result);
-        }
-        else {
-            $result;
-        }
-    }
-    else {
-        $result;
-    }
+    nqp::nativecallcast(nqp::decont($target-type),
+        nqp::decont(map_return_type($target-type)), nqp::decont($source));
 }
 
 # vim:ft=perl6
