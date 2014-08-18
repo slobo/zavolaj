@@ -38,19 +38,19 @@ DLLEXPORT void TakeStructCallback(void (*cb)(Struct *)) {
 DLLEXPORT void CheckReturnsFloat(double (*cb)()) {
     double num = cb();
     if(num != 1.23) printf("not ");
-    printf("ok - num callback return value\n");
+    printf("    ok - num callback return value\n");
 }
 
 DLLEXPORT void CheckReturnsStr(char *(*cb)()) {
     char *str = cb();
     if(strcmp(str, "Herps and derps")) printf("not ");
-    printf("ok - string callback return value\n");
+    printf("    ok - string callback return value\n");
 }
 
 DLLEXPORT void CheckReturnsStruct(Struct *(*cb)()) {
     Struct *s = cb();
     if(s->ival != 314) printf("not ");
-    printf("ok - struct (intval) callback return value\n");
+    printf("    ok - struct (intval) callback return value\n");
     if(strcmp(s->str, "Tweedledum, tweedledee")) printf("not ");
-    printf("ok - struct (string) callback return value\n");
+    printf("    ok - struct (string) callback return value\n");
 }

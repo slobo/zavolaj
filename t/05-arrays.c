@@ -54,11 +54,11 @@ DLLEXPORT Struct **ReturnAStructArray() {
 
 DLLEXPORT void TakeAStructArray(Struct **structs) {
     if(structs[0]->value != 7) printf("not ");
-    printf("ok - struct in position 0, C-side\n");
+    printf("    ok - struct in position 0, C-side\n");
     if(structs[1]->value != 11) printf("not ");
-    printf("ok - struct in position 1, C-side\n");
+    printf("    ok - struct in position 1, C-side\n");
     if(structs[2]->value != 13) printf("not ");
-    printf("ok - struct in position 2, C-side\n");
+    printf("    ok - struct in position 2, C-side\n");
 }
 
 DLLEXPORT char *ReturnsAByteArray() {
@@ -71,11 +71,11 @@ DLLEXPORT char *ReturnsAByteArray() {
 
 DLLEXPORT void TakeAByteArray(char *bytes) {
     if(bytes[0] != 31) printf("not ");
-    printf("ok - byte in position 0, C-side\n");
+    printf("    ok - byte in position 0, C-side\n");
     if(bytes[1] != 28) printf("not ");
-    printf("ok - byte in position 1, C-side\n");
+    printf("    ok - byte in position 1, C-side\n");
     if(bytes[2] != 30) printf("not ");
-    printf("ok - byte in position 2, C-side\n");
+    printf("    ok - byte in position 2, C-side\n");
 }
 
 DLLEXPORT float *ReturnsAFloatArray() {

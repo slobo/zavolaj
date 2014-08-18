@@ -51,15 +51,15 @@ DLLEXPORT MyStruct *ReturnAStruct()
 DLLEXPORT void TakeAStruct(MyStruct *obj)
 {
     if(obj->intval != 42) printf("not ");
-    printf("ok - C-side int value\n");
+    printf("    ok - C-side int value\n");
     if(obj->numval != -3.7) printf("not ");
-    printf("ok - C-side num value\n");
+    printf("    ok - C-side num value\n");
     if(obj->byteval != 7) printf("not ");
-    printf("ok - C-side int8 value\n");
+    printf("    ok - C-side int8 value\n");
     if(!obj->arr || obj->arr[0] != 1) printf("not ");
-    printf("ok - C-side array value, element 1\n");
+    printf("    ok - C-side array value, element 1\n");
     if(!obj->arr || obj->arr[1] != 2) printf("not ");
-    printf("ok - C-side array value, element 2\n");
+    printf("    ok - C-side array value, element 2\n");
 }
 
 DLLEXPORT StructStruct *ReturnAStructStruct() {
@@ -76,13 +76,13 @@ DLLEXPORT StructStruct *ReturnAStructStruct() {
 
 DLLEXPORT void TakeAStructStruct(StructStruct *obj) {
     if(!obj->a || obj->a->first != 13) printf("not ");
-    printf("ok - int 1 in struct 1 in struct\n");
+    printf("    ok - int 1 in struct 1 in struct\n");
     if(!obj->a || obj->a->second != 17) printf("not ");
-    printf("ok - int 2 in struct 1 in struct\n");
+    printf("    ok - int 2 in struct 1 in struct\n");
     if(!obj->b || obj->b->first != 0.9) printf("not ");
-    printf("ok - int 1 in struct 2 in struct\n");
+    printf("    ok - int 1 in struct 2 in struct\n");
     if(!obj->b || obj->b->second != 3.14) printf("not ");
-    printf("ok - int 2 in struct 2 in struct\n");
+    printf("    ok - int 2 in struct 2 in struct\n");
 }
 
 DLLEXPORT PointerStruct *ReturnAPointerStruct() {
@@ -103,9 +103,9 @@ DLLEXPORT StringStruct *ReturnAStringStruct() {
 
 DLLEXPORT void TakeAStringStruct(StringStruct *obj) {
     if(strcmp(obj->first, "Lorem")) printf("not ");
-    printf("ok - C-value of first string in struct\n");
+    printf("    ok - C-value of first string in struct\n");
     if(strcmp(obj->second, "ipsum")) printf("not ");
-    printf("ok - C-value of second string in struct\n");
+    printf("    ok - C-value of second string in struct\n");
 }
 
 DLLEXPORT long _deref(long *ptr) {

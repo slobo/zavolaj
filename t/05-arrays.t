@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 26;
+plan 20;
 
 compile_test_lib('05-arrays');
 

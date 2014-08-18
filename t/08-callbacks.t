@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan(9);
+plan(5);
 
 compile_test_lib('08-callbacks');
 

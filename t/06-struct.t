@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan 30;
+plan 19;
 
 compile_test_lib('06-struct');
 
