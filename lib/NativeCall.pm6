@@ -294,7 +294,7 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(Opaq
 }
 
 multi sub postcircumfix:<[ ]>(CArray:D \array, $pos) is export(:DEFAULT, :types) {
-    $pos.list.map: { array.at_pos($_) };
+    $pos ~~ Iterable ?? $pos.map: { array.at_pos($_) } !! array.at_pos($pos);
 }
 multi sub postcircumfix:<[ ]>(CArray:D \array, *@pos) is export(:DEFAULT, :types) {
     @pos.map: { array.at_pos($_) };
