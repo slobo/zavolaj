@@ -293,6 +293,14 @@ my class CArray is export(:types, :DEFAULT) is repr('CArray') is array_type(Opaq
     }
 }
 
+multi sub postcircumfix:<[ ]>(CArray:D \array, $pos) is export(:DEFAULT, :types) {
+    $pos.list.map: { array.at_pos($_) };
+}
+multi sub postcircumfix:<[ ]>(CArray:D \array, *@pos) is export(:DEFAULT, :types) {
+    @pos.map: { array.at_pos($_) };
+}
+
+
 multi trait_mod:<is>(Routine $r, :$symbol!) is export(:DEFAULT, :traits) {
     $r does NativeCallSymbol[$symbol];
 }
