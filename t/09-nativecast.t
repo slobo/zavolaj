@@ -3,7 +3,7 @@ use t::CompileTestLib;
 use NativeCall;
 use Test;
 
-plan(10);
+plan(9);
 
 compile_test_lib('09-nativecast');
 
@@ -16,8 +16,6 @@ class CUTE is repr('CStruct') {
     has int32 $.i;
 }
 is nativecast(CUTE, ReturnStruct()).i, 100, 'casting to CStruct works';
-
-is nativecast(CUTE, nativecast(OpaquePointer, ReturnStruct())).i, 100, 'casting to CPointer works';
 
 sub ReturnInt() returns OpaquePointer is native('./09-nativecast') { * }
 is nativecast(int32, ReturnInt()), 101, 'casting to int32 works';
