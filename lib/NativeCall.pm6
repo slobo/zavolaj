@@ -101,6 +101,20 @@ my role NativeCallSymbol[Str $name] {
     method native_symbol()  { $name }
 }
 
+sub guess_library_name($libname) {
+    if !$libname.DEFINITE { '' }
+    elsif $libname ~~ /\.\w+$/ { $libname }
+    elsif $*VM.config<load_ext> :exists { $libname ~ $*VM.config<load_ext> }
+    elsif $*VM.config<dll> :exists {
+        my $ext = $*VM.config<dll>;
+        $ext ~~ s/^.*\%s//;
+        "$libname$ext";
+    }
+    elsif $*OS eq 'MSWin32' { "{$libname}.dll"; }
+    # TODO: more extension guessing
+    else { "{$libname}.so"; }
+}
+
 # This role is mixed in to any routine that is marked as being a
 # native call.
 my role Native[Routine $r, Str $libname] {
@@ -112,20 +126,8 @@ my role Native[Routine $r, Str $libname] {
         unless $!setup {
             my Mu $arg_info := param_list_for($r.signature);
             my str $conv = self.?native_call_convention || '';
-            my $realname;
-            if !$libname.DEFINITE { $realname = ""; }
-            elsif $libname ~~ /\.\w+$/ { $realname = $libname }
-            elsif $*VM.config<load_ext> :exists { $realname = $libname ~ $*VM.config<load_ext> }
-            elsif $*VM.config<dll> :exists {
-                my $ext = $*VM.config<dll>;
-                $ext ~~ s/^.*\%s//;
-                $realname = "$libname$ext";
-            }
-            elsif $*OS eq 'MSWin32' { $realname = "{$libname}.dll"; }
-            # TODO: more extension guessing
-            else { $realname = "{$libname}.so"; }
             nqp::buildnativecall(self,
-                nqp::unbox_s($realname),    # library name
+                nqp::unbox_s(guess_library_name($libname)),    # library name
                 nqp::unbox_s(self.?native_symbol // $r.name),      # symbol to call
                 nqp::unbox_s($conv),        # calling convention
                 $arg_info,
@@ -343,6 +345,19 @@ multi refresh($obj) is export(:DEFAULT, :utils) {
 sub nativecast($target-type, $source) is export(:DEFAULT) {
     nqp::nativecallcast(nqp::decont($target-type),
         nqp::decont(map_return_type($target-type)), nqp::decont($source));
+}
+
+sub cglobal($libname, $symbol, $target-type) is export {
+    Proxy.new(
+        FETCH => -> $ {
+            nqp::nativecallglobal(
+                nqp::unbox_s(guess_library_name($libname)),
+                nqp::unbox_s($symbol),
+                nqp::decont($target-type),
+                nqp::decont(map_return_type($target-type)))
+        },
+        STORE => -> | { die "Writing to C globals NYI" }
+    )
 }
 
 # vim:ft=perl6
