@@ -103,7 +103,7 @@ my role NativeCallSymbol[Str $name] {
 
 sub guess_library_name($libname) {
     if !$libname.DEFINITE { '' }
-    elsif $libname ~~ /\.\w+$/ { $libname }
+    elsif $libname ~~ /\.<.alpha>+$/ { $libname }
     elsif $*VM.config<load_ext> :exists { $libname ~ $*VM.config<load_ext> }
     elsif $*VM.config<dll> :exists {
         my $ext = $*VM.config<dll>;
