@@ -235,7 +235,7 @@ Prepare your system along these lines before trying out the examples:
     GRANT CREATE      ON zavolaj.* TO 'testuser'@'localhost';
     GRANT DROP        ON zavolaj.* TO 'testuser'@'localhost';
     GRANT INSERT      ON zavolaj.* TO 'testuser'@'localhost';
-    GRANT DELETET     ON zavolaj.* TO 'testuser'@'localhost';
+    GRANT DELETE      ON zavolaj.* TO 'testuser'@'localhost';
     GRANT SELECT      ON zavolaj.* TO 'testuser'@'localhost';
     GRANT LOCK TABLES ON zavolaj.* TO 'testuser'@'localhost';
     GRANT SELECT      ON   mysql.* TO 'testuser'@'localhost';
