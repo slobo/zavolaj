@@ -23,9 +23,7 @@ DLLEXPORT void TakeIntCallback(void (*cb)(int)) {
 }
 
 DLLEXPORT void TakeStringCallback(void (*cb)(char *)) {
-    /* strdup() so that the dyncall stuff doesn't try to free a stack
-     * allocated string. */
-    cb(strdup("lorem ipsum"));
+    cb("lorem ipsum");
 }
 
 DLLEXPORT void TakeStructCallback(void (*cb)(Struct *)) {
