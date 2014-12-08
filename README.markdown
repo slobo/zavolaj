@@ -204,6 +204,15 @@ members: $!struct-member := StructObj.new;
 As you may have predicted by now, a null is represented by the type object of the
 struct type.
 
+## Function arguments
+Zavolaj also supports native functions that take functions as arguments.  One example
+of this is using function pointers as callbacks in an event-driven system.  When
+binding these functions via Zavolaj, one need only provide the equivalent signature
+as a constraint on the code parameter:
+
+    # void SetCallback(int (*callback)(const char *))
+    my sub SetCallback(&callback(Str --> int32)) is native('mylib') { * }
+
 ## The Future
 See the TODO file. In general, though, it's mostly about making arrays and structs
 much more capable, providing more options for memory management and supporting
