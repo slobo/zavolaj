@@ -17,14 +17,14 @@ class Struct is repr('CStruct') {
     }
 }
 
-sub TakeACallback(&cb()) is native('./08-callbacks') { * }
-sub TakeIntCallback(&cb(int)) is native('./08-callbacks') { * }
-sub TakeStringCallback(&cb(Str)) is native('./08-callbacks') { * }
-sub TakeStructCallback(&cb(Struct)) is native('./08-callbacks') { * }
+sub TakeACallback(&cb ()) is native('./08-callbacks') { * }
+sub TakeIntCallback(&cb (int)) is native('./08-callbacks') { * }
+sub TakeStringCallback(&cb (Str)) is native('./08-callbacks') { * }
+sub TakeStructCallback(&cb (Struct)) is native('./08-callbacks') { * }
 
-sub CheckReturnsFloat(&cb(--> num)) is native('./08-callbacks') { * }
-sub CheckReturnsStr(&cb(--> Str)) is native('./08-callbacks') { * }
-sub CheckReturnsStruct(&cb(--> Struct)) is native('./08-callbacks') { * }
+sub CheckReturnsFloat(&cb (--> num)) is native('./08-callbacks') { * }
+sub CheckReturnsStr(&cb (--> Str)) is native('./08-callbacks') { * }
+sub CheckReturnsStruct(&cb (--> Struct)) is native('./08-callbacks') { * }
 
 sub simple_callback() {
     pass 'simple callback';
