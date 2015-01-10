@@ -49,7 +49,7 @@ compile_test_lib('05-arrays');
 
 {
     class Struct is repr('CStruct') {
-        has int $.val;
+        has clong $.val;
 
         method set($x) {
             $!val = $x;
