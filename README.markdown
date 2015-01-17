@@ -211,7 +211,7 @@ binding these functions via Zavolaj, one need only provide the equivalent signat
 as a constraint on the code parameter:
 
     # void SetCallback(int (*callback)(const char *))
-    my sub SetCallback(&callback(Str --> int32)) is native('mylib') { * }
+    my sub SetCallback(&callback (Str --> int32)) is native('mylib') { * }
 
 ## The Future
 See the TODO file. In general, though, it's mostly about making arrays and structs
