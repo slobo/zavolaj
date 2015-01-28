@@ -123,7 +123,7 @@ my role Native[Routine $r, Str $libname] {
     has native_callsite $!call is box_target;
     has Mu $!rettype;
     
-    method postcircumfix:<( )>($args) {
+    method postcircumfix:<( )>(|args) {
         unless $!setup {
             my Mu $arg_info := param_list_for($r.signature);
             my str $conv = self.?native_call_convention || '';
@@ -136,7 +136,7 @@ my role Native[Routine $r, Str $libname] {
             $!setup = 1;
             $!rettype := nqp::decont(map_return_type($r.returns));
         }
-        nqp::nativecall($!rettype, self, nqp::getattr(nqp::decont($args), Capture, '$!list'))
+        nqp::nativecall($!rettype, self, nqp::getattr(nqp::decont(args), Capture, '$!list'))
     }
 }
 
