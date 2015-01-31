@@ -91,6 +91,15 @@ compile_test_lib('05-arrays');
     @parr[2] = 30;
     TakeAByteArray(@parr);
 }
+    
+{
+    sub TakeAByteArray(Buf) is native("./05-arrays") { * }
+    my $buf = buf8.new;
+    $buf[0] = 31;
+    $buf[1] = 28;
+    $buf[2] = 30;
+    TakeAByteArray($buf);
+}
 
 {
     sub ReturnsAFloatArray() returns CArray[num32] is native("./05-arrays") { * }

@@ -86,6 +86,8 @@ sub type_code_for(Mu ::T) {
         if T.REPR eq 'CPointer';
     return 'carray'
         if T.REPR eq 'CArray';
+    return 'vmarray'
+        if T.^name ~~ any(/^Buf/, /^Blob/);
     die "Unknown type {T.^name} used in native call.\n" ~
         "If you want to pass a struct, be sure to use the CStruct representation.\n" ~
         "If you want to pass an array, be sure to use the CArray type.";
