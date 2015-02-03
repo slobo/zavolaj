@@ -77,17 +77,24 @@ my %type_map =
     'num'      => 'double',
     'Num'      => 'double',
     'Callable' => 'callback';
+
+my %repr_map =
+    'CStruct'   => 'cstruct',
+    'CPointer'  => 'cpointer',
+    'CArray'    => 'carray',
+    'VMArray'   => 'vmarray',
+    ;
 sub type_code_for(Mu ::T) {
     return %type_map{T.^name}
         if %type_map{T.^name}:exists;
-    return 'cstruct'
-        if T.REPR eq 'CStruct';
-    return 'cpointer'
-        if T.REPR eq 'CPointer';
-    return 'carray'
-        if T.REPR eq 'CArray';
+    if %repr_map{T.REPR} -> $mapped {
+        return $mapped;
+    }
+    # the REPR of a Buf or Blob type object is Uninstantiable, so
+    # needs an extra special case here that isn't covered in the
+    # hash lookup above.
     return 'vmarray'
-        if T.^name ~~ any(/^Buf/, /^Blob/);
+        if T ~~ Blob;
     die "Unknown type {T.^name} used in native call.\n" ~
         "If you want to pass a struct, be sure to use the CStruct representation.\n" ~
         "If you want to pass an array, be sure to use the CArray type.";
