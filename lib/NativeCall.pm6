@@ -65,7 +65,7 @@ sub return_hash_for(Signature $s, &r?, :$with-typeobj) {
     $result
 }
 
-my native long is repr("P6int") is Int is nativesize("long") is export(:types, :DEFAULT) { };
+my native long is repr("P6int") is Int is ctype("long") is export(:types, :DEFAULT) { };
 
 # Gets the NCI type code to use based on a given Perl 6 type.
 my %type_map =
