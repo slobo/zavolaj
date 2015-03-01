@@ -216,6 +216,10 @@ as a constraint on the code parameter:
     # void SetCallback(int (*callback)(const char *))
     my sub SetCallback(&callback (Str --> int32)) is native('mylib') { * }
 
+Note: the native code is responsible for memory management of values passed to
+Perl 6 callbacks this way. In other words, NativeCall will not free() strings passed
+to callbacks.
+
 ## The Future
 See the TODO file. In general, though, it's mostly about making arrays and structs
 much more capable, providing more options for memory management and supporting
