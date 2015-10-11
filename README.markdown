@@ -17,9 +17,11 @@ compiler, so there is no need to install it separately.
 ## Getting Started
 The simplest imaginable use of Zavolaj would look something like this:
 
-    use NativeCall;
-    sub some_argless_function() is native('libsomething') { * }
-    some_argless_function();
+```perl6
+use NativeCall;
+sub some_argless_function() is native('libsomething') { * }
+some_argless_function();
+```
 
 The first line imports various traits and types. The next line looks like
 a relatively ordinary Perl 6 sub declaration - with a twist. We use the
@@ -45,9 +47,11 @@ create.
 Zavolaj provides a "symbol" trait for you to specify the name of the native
 routine in your library that may be different from your Perl subroutine name.
 
-    module Foo;
-    use NativeCall;
-    our sub Init() is native('libfoo') is symbol('FOO_INIT') { * }
+```perl6
+module Foo;
+use NativeCall;
+our sub Init() is native('libfoo') is symbol('FOO_INIT') { * }
+```
 
 Inside of "libfoo" there is a routine called "FOO\_INIT" but, since we're
 creating a module called Foo and we'd rather call the routine as Foo::Init, 
@@ -59,7 +63,9 @@ Normal Perl 6 signatures and the "returns" trait are used in order to convey
 the type of arguments a native function expects and what it returns. Here is
 an example.
 
-    sub add(int32, int32) returns int32 is native("libcalculator") { * }
+```perl6
+sub add(int32, int32) returns int32 is native("libcalculator") { * }
+```
 
 Here, we have declared that the function takes two 32-bit integers and returns
 a 32-bit integer. Here are some of the other types that you may pass (this will
@@ -80,12 +86,16 @@ Note that the lack of a "returns" trait is used to indicate void return type.
 For strings, there is an additional "encoded" trait to give some extra hints on
 how to do the marshalling.
 
-    sub message_box(Str is encoded('utf8')) is native('libgui') { * }
+```perl6
+sub message_box(Str is encoded('utf8')) is native('libgui') { * }
+```
 
 To specify how to marshall string return types, just apply this trait to the
 routine itself.
 
-    sub input_box() returns Str is encoded('utf8') is native('libgui') { * }
+```perl6
+sub input_box() returns Str is encoded('utf8') is native('libgui') { * }
+```
 
 Note that a null string can be passed by passing the Str type object; a null
 return will also be represented by the type object.
@@ -95,23 +105,27 @@ Sometimes you need to get a pointer (for example, a library handle) back from a
 C library. You don't care about what it points to - you just need to keep hold
 of it. The OpaquePointer type provides for this.
 
-    sub Foo_init() returns OpaquePointer is native("libfoo") { * }
-    sub Foo_free(OpaquePointer) is native("libfoo") { * }
+```perl6
+sub Foo_init() returns OpaquePointer is native("libfoo") { * }
+sub Foo_free(OpaquePointer) is native("libfoo") { * }
+```
 
 This works out OK, but you may fancy working with a type named something better
 than OpaquePointer. It turns out that any class with the representation "CPointer"
 can serve this role. This means you can expose libraries that work on handles
 by writing a class like this:
 
-    class FooHandle is repr('CPointer') {
-        # Here are the actual Zavolaj functions.
-        sub Foo_init() returns FooHandle is native("libfoo") { * }
-        sub Foo_free(FooHandle) is native("libfoo") { * }
-        
-        # Here are the methods we use to expose it to the outside world.
-        method new() { Foo_init() }
-        method free() { Foo_free(self) }
-    }
+```perl6
+class FooHandle is repr('CPointer') {
+    # Here are the actual Zavolaj functions.
+    sub Foo_init() returns FooHandle is native("libfoo") { * }
+    sub Foo_free(FooHandle) is native("libfoo") { * }
+    
+    # Here are the methods we use to expose it to the outside world.
+    method new() { Foo_init() }
+    method free() { Foo_free(self) }
+}
+```
 
 Note that the CPointer representation can do nothing more than hold a C pointer.
 This means that your class cannot have extra attributes. However, for simple
@@ -119,7 +133,9 @@ libraries this may be a neat way to expose an object oriented interface to it.
 
 Of course, you can always have an empty class:
 
-    class DoorHandle is repr('CPointer') { }
+```perl6
+class DoorHandle is repr('CPointer') { }
+```
 
 And just use the class as you would use OpaquePointer, but with potential for
 better type safety and more readable code.
@@ -138,26 +154,30 @@ a much more primitive CArray type, which you must use if working with C arrays.
 
 Here is an example of passing a C array.
 
-    sub RenderBarChart(Str, int, CArray[Str], CArray[num]) is native("libchart") { * }
-    my @titles := CArray[Str].new();
-    @titles[0] = 'Me';
-    @titles[1] = 'You';
-    @titles[2] = 'Your Mom';
-    my @values := CArray[num].new();
-    @values[0] = 59.5e0;
-    @values[1] = 61.2e0;
-    @values[2] = 120.7e0;
-    RenderBarChart('Weights (kg)', 3, @titles, @values);
+```perl6
+sub RenderBarChart(Str, int, CArray[Str], CArray[num]) is native("libchart") { * }
+my @titles := CArray[Str].new();
+@titles[0] = 'Me';
+@titles[1] = 'You';
+@titles[2] = 'Your Mom';
+my @values := CArray[num].new();
+@values[0] = 59.5e0;
+@values[1] = 61.2e0;
+@values[2] = 120.7e0;
+RenderBarChart('Weights (kg)', 3, @titles, @values);
+```
 
 Note that binding was used to @titles, *NOT* assignment! If you assign, you
 are putting the values into a Perl 6 array, and it will not work out. If this
 all freaks you out, forget you ever knew anything about the "@" sigil and just
 use "$" all the way when using Zavolaj. :-)
 
-    my $titles = CArray[Str].new();
-    $titles[0] = 'Me';
-    $titles[1] = 'You';
-    $titles[2] = 'Your Mom';
+```perl6
+my $titles = CArray[Str].new();
+$titles[0] = 'Me';
+$titles[1] = 'You';
+$titles[2] = 'Your Mom';
+```
 
 Getting return values for arrays works out just the same.
 
@@ -182,10 +202,12 @@ Perl 6 class that, under the hood, stores its attributes in the same way a C
 compiler would lay them out in a similar struct definition. All it takes is a
 quick use of the "repr" trait:
 
-    class Point is repr('CStruct') {
-        has num64 $.x;
-        has num64 $.y;
-    }
+```perl6
+class Point is repr('CStruct') {
+    has num64 $.x;
+    has num64 $.y;
+}
+```
 
 The attributes can only be of the types that Zavolaj knows how to marshall into
 struct fields. Currently, structs can contain machine-sized integers, doubles,
@@ -213,8 +235,10 @@ of this is using function pointers as callbacks in an event-driven system.  When
 binding these functions via Zavolaj, one need only provide the equivalent signature
 as a constraint on the code parameter:
 
-    # void SetCallback(int (*callback)(const char *))
-    my sub SetCallback(&callback (Str --> int32)) is native('mylib') { * }
+```perl6
+# void SetCallback(int (*callback)(const char *))
+my sub SetCallback(&callback (Str --> int32)) is native('mylib') { * }
+```
 
 Note: the native code is responsible for memory management of values passed to
 Perl 6 callbacks this way. In other words, NativeCall will not free() strings passed
